@@ -291,7 +291,6 @@
     let isListening = false;
     let recognition = null;
     let sessions = [];
-    let countedInSegment = 0;
 
     const countNum = document.getElementById('countNum');
     const ring = document.getElementById('ring');
@@ -357,7 +356,6 @@
 
       recognition.onstart = () => {
         isListening = true;
-        countedInSegment = 0;
         dot.className = 'dot active';
         statusText.textContent = 'Listening…';
         ring.classList.add('listening');
@@ -366,32 +364,35 @@
       };
 
       recognition.onresult = (e) => {
+        let detectedInterim = false;
+        
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const result = e.results[i];
           const transcript = result[0].transcript;
-          console.log('Heard:', transcript);
           
           const numMatches = countOccurrences(transcript);
           
           if (result.isFinal) {
-            // Update any remaining counts that weren't caught in interim out of the final string
-            if (numMatches > countedInSegment) {
-              updateCount(count + (numMatches - countedInSegment));
-            }
-            countedInSegment = 0; // reset for the next breath/segment
-          } else {
-            // Interim result (while you are still speaking in the same continuous burst)
-            if (numMatches > countedInSegment) {
-              updateCount(count + (numMatches - countedInSegment));
-              countedInSegment = numMatches; // track what we have already added
-              
+            console.log('Final Heard:', transcript, 'Matches:', numMatches);
+            if (numMatches > 0) {
+              updateCount(count + numMatches);
               dot.className = 'dot detected';
-              statusText.textContent = 'Detected! Keep going…';
+              statusText.textContent = 'Counted! Keep going…';
               setTimeout(() => {
                 if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
               }, 1000);
             }
+          } else {
+            // Provide visual feedback while you are speaking without incrementing the actual number yet
+            if (numMatches > 0) {
+              detectedInterim = true;
+            }
           }
+        }
+        
+        if (detectedInterim) {
+          statusText.textContent = 'Hearing you...';
+          dot.className = 'dot detected';
         }
       };
 
