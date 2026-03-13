@@ -283,7 +283,7 @@
       <div class="sessions" id="sessionList"></div>
     </div>
 
-    <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required</div>
+    <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required<br><br><b>Important Setup Note:</b> For your microphone to stay connected without asking for permission every time, you must run this over a local server (like the VS Code <b>Live Server</b> extension), <i>not</i> just by double clicking the file.</div>
   </div>
 
   <script>
@@ -291,6 +291,7 @@
     let isListening = false;
     let recognition = null;
     let sessions = [];
+    let countedInSegment = 0;
 
     const countNum = document.getElementById('countNum');
     const ring = document.getElementById('ring');
@@ -301,16 +302,11 @@
     const historyBlock = document.getElementById('historyBlock');
     const sessionList = document.getElementById('sessionList');
 
-    const variants = [
-      'astaghfirullah', 'astagh firullah', 'astagfirullah', 'astaghfirullahi',
-      'astagh firullahi', 'astagfirullahi', 'astaghferullah', 'astagferullah',
-      'istagfirullah', 'astagferullahi', 'astaghfirullaah', 'astagfirullaah',
-      'astaghfirulah', 'astagfirulah'
-    ];
-
-    function matchesPhrase(transcript) {
-      const t = transcript.toLowerCase().replace(/[^a-z ]/g, '');
-      return variants.some(v => t.includes(v));
+    function countOccurrences(transcript) {
+      // Create a regex to find multiple occurrences of the word in a single long sentence
+      // This allows you to say it quickly one right after the other
+      const matches = transcript.match(/(استغفر|أستغفر|astagh|astag|istag)/gi);
+      return matches ? matches.length : 0;
     }
 
     function updateCount(n) {
@@ -355,12 +351,13 @@
       }
       errorMsg.style.display = 'none';
       recognition = new SR();
-      recognition.lang = 'en-US';
+      recognition.lang = 'ar-SA';
       recognition.continuous = true;
       recognition.interimResults = true;
 
       recognition.onstart = () => {
         isListening = true;
+        countedInSegment = 0;
         dot.className = 'dot active';
         statusText.textContent = 'Listening…';
         ring.classList.add('listening');
@@ -371,13 +368,29 @@
       recognition.onresult = (e) => {
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const result = e.results[i];
-          if (result.isFinal && matchesPhrase(result[0].transcript)) {
-            updateCount(count + 1);
-            dot.className = 'dot detected';
-            statusText.textContent = 'Detected! Keep going…';
-            setTimeout(() => {
-              if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
-            }, 1000);
+          const transcript = result[0].transcript;
+          console.log('Heard:', transcript);
+          
+          const numMatches = countOccurrences(transcript);
+          
+          if (result.isFinal) {
+            // Update any remaining counts that weren't caught in interim out of the final string
+            if (numMatches > countedInSegment) {
+              updateCount(count + (numMatches - countedInSegment));
+            }
+            countedInSegment = 0; // reset for the next breath/segment
+          } else {
+            // Interim result (while you are still speaking in the same continuous burst)
+            if (numMatches > countedInSegment) {
+              updateCount(count + (numMatches - countedInSegment));
+              countedInSegment = numMatches; // track what we have already added
+              
+              dot.className = 'dot detected';
+              statusText.textContent = 'Detected! Keep going…';
+              setTimeout(() => {
+                if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
+              }, 1000);
+            }
           }
         }
       };
