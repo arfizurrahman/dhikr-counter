@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dhikr Counter — Astaghfirullah</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f9f7f3;
+      --surface: #ffffff;
+      --surface2: #f2efe8;
+      --border: rgba(0,0,0,0.10);
+      --border2: rgba(0,0,0,0.18);
+      --text: #1a1a18;
+      --text2: #6b6b65;
+      --green: #1D9E75;
+      --green-dark: #0F6E56;
+      --green-deep: #085041;
+      --green-light: #E1F5EE;
+      --red: #A32D2D;
+      --radius: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111210;
+        --surface: #1c1d1a;
+        --surface2: #252623;
+        --border: rgba(255,255,255,0.09);
+        --border2: rgba(255,255,255,0.16);
+        --text: #f0ede6;
+        --text2: #888880;
+        --green-light: #04342C;
+      }
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body {
+      padding: 2rem 1rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem 2.5rem;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .app-title {
+      font-family: 'Amiri', serif;
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .app-sub {
+      font-size: 13px;
+      color: var(--text2);
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .ring {
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+      background: var(--surface2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.8rem;
+      transition: border-color 0.3s, background 0.3s;
+      position: relative;
+    }
+
+    .ring.listening {
+      border-color: var(--green);
+      border-width: 3px;
+      background: var(--green-light);
+    }
+
+    .ring.pulse {
+      animation: pulse 0.45s ease-out;
+    }
+
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.07); }
+      100% { transform: scale(1); }
+    }
+
+    .count-num {
+      font-family: 'Amiri', serif;
+      font-size: 80px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text);
+    }
+
+    .count-label {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 4px;
+      letter-spacing: 0.05em;
+      text-transform: lowercase;
+    }
+
+    .arabic {
+      font-family: 'Amiri', serif;
+      font-size: 24px;
+      color: var(--text2);
+      direction: rtl;
+      margin-bottom: 1.4rem;
+      text-align: center;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 1.8rem;
+      min-height: 22px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border2);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .dot.active {
+      background: var(--green);
+      animation: blink 1.2s infinite;
+    }
+
+    .dot.detected {
+      background: var(--green-deep);
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.25; }
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 11px 0;
+      border-radius: var(--radius);
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn:hover { background: var(--surface2); }
+    .btn:active { transform: scale(0.97); }
+
+    .btn.primary {
+      border-color: var(--green);
+      color: var(--green-dark);
+      font-weight: 500;
+    }
+
+    .btn.primary.on {
+      background: var(--green);
+      color: #fff;
+    }
+
+    .error-msg {
+      font-size: 12px;
+      color: var(--red);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+
+    .history {
+      margin-top: 2rem;
+      width: 100%;
+      border-top: 1px solid var(--border);
+      padding-top: 1.2rem;
+    }
+
+    .history-title {
+      font-size: 11px;
+      color: var(--text2);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .sessions { display: flex; flex-direction: column; gap: 6px; }
+
+    .session-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      padding: 7px 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      color: var(--text2);
+    }
+
+    .session-count {
+      font-weight: 500;
+      color: var(--green-dark);
+    }
+
+    .footer {
+      margin-top: 2.5rem;
+      font-size: 11px;
+      color: var(--text2);
+      text-align: center;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="app-title">Dhikr Counter</div>
+    <div class="app-sub">Say "Astaghfirullah" — it will be counted</div>
+
+    <div class="ring" id="ring">
+      <div class="count-num" id="countNum">0</div>
+      <div class="count-label">times</div>
+    </div>
+
+    <div class="arabic">أَسْتَغْفِرُ اللَّهَ</div>
+
+    <div class="status-row">
+      <div class="dot" id="dot"></div>
+      <span id="statusText">Press "Start" to begin</span>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" id="startBtn" onclick="toggleListen()">Start listening</button>
+      <button class="btn" onclick="resetCount()">Reset</button>
+    </div>
+
+    <div id="errorMsg" class="error-msg" style="display:none"></div>
+
+    <div class="history" id="historyBlock" style="display:none">
+      <div class="history-title">Session history</div>
+      <div class="sessions" id="sessionList"></div>
+    </div>
+
+    <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required</div>
+  </div>
+
+  <script>
+    let count = 0;
+    let isListening = false;
+    let recognition = null;
+    let sessions = [];
+
+    const countNum = document.getElementById('countNum');
+    const ring = document.getElementById('ring');
+    const dot = document.getElementById('dot');
+    const statusText = document.getElementById('statusText');
+    const startBtn = document.getElementById('startBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const historyBlock = document.getElementById('historyBlock');
+    const sessionList = document.getElementById('sessionList');
+
+    const variants = [
+      'astaghfirullah', 'astagh firullah', 'astagfirullah', 'astaghfirullahi',
+      'astagh firullahi', 'astagfirullahi', 'astaghferullah', 'astagferullah',
+      'istagfirullah', 'astagferullahi', 'astaghfirullaah', 'astagfirullaah',
+      'astaghfirulah', 'astagfirulah'
+    ];
+
+    function matchesPhrase(transcript) {
+      const t = transcript.toLowerCase().replace(/[^a-z ]/g, '');
+      return variants.some(v => t.includes(v));
+    }
+
+    function updateCount(n) {
+      count = n;
+      countNum.textContent = n;
+      ring.classList.add('pulse');
+      setTimeout(() => ring.classList.remove('pulse'), 500);
+    }
+
+    function resetCount() {
+      if (count > 0) {
+        const now = new Date();
+        sessions.unshift({
+          count,
+          time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+        if (sessions.length > 5) sessions.pop();
+        renderSessions();
+      }
+      count = 0;
+      countNum.textContent = 0;
+    }
+
+    function renderSessions() {
+      if (sessions.length === 0) { historyBlock.style.display = 'none'; return; }
+      historyBlock.style.display = 'block';
+      sessionList.innerHTML = sessions.map(s =>
+        `<div class="session-item"><span>${s.time}</span><span class="session-count">${s.count}×</span></div>`
+      ).join('');
+    }
+
+    function toggleListen() {
+      isListening ? stopListening() : startListening();
+    }
+
+    function startListening() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        errorMsg.textContent = 'Speech recognition is not supported in your browser. Please use Chrome or Edge.';
+        errorMsg.style.display = 'block';
+        return;
+      }
+      errorMsg.style.display = 'none';
+      recognition = new SR();
+      recognition.lang = 'en-US';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        isListening = true;
+        dot.className = 'dot active';
+        statusText.textContent = 'Listening…';
+        ring.classList.add('listening');
+        startBtn.textContent = 'Stop listening';
+        startBtn.classList.add('on');
+      };
+
+      recognition.onresult = (e) => {
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const result = e.results[i];
+          if (result.isFinal && matchesPhrase(result[0].transcript)) {
+            updateCount(count + 1);
+            dot.className = 'dot detected';
+            statusText.textContent = 'Detected! Keep going…';
+            setTimeout(() => {
+              if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
+            }, 1000);
+          }
+        }
+      };
+
+      recognition.onerror = (e) => {
+        if (e.error === 'not-allowed') {
+          errorMsg.textContent = 'Microphone access denied. Please allow microphone access in your browser settings.';
+          errorMsg.style.display = 'block';
+          stopListening();
+        }
+      };
+
+      recognition.onend = () => { if (isListening) recognition.start(); };
+      recognition.start();
+    }
+
+    function stopListening() {
+      isListening = false;
+      if (recognition) { recognition.onend = null; recognition.stop(); recognition = null; }
+      dot.className = 'dot';
+      statusText.textContent = 'Stopped. Press "Start" to resume.';
+      ring.classList.remove('listening');
+      startBtn.textContent = 'Start listening';
+      startBtn.classList.remove('on');
+    }
+  </script>
+</body>
+</html>
