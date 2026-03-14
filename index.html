@@ -232,6 +232,22 @@
       color: #fff;
     }
 
+    .btn.danger {
+      border-color: rgba(163, 45, 45, 0.5);
+      color: var(--red);
+    }
+
+    .btn.danger:hover {
+      background: rgba(163, 45, 45, 0.08);
+    }
+
+    .data-actions {
+      margin-top: 0.8rem;
+      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
+
     .error-msg {
       font-size: 12px;
       color: var(--red);
@@ -361,6 +377,11 @@
       <button class="btn" onclick="resetCount()">Reset</button>
     </div>
 
+    <div class="data-actions">
+      <button class="btn danger" onclick="clearCurrentDhikrData()">Clear this dhikr</button>
+      <button class="btn danger" onclick="clearAllData()">Clear all data</button>
+    </div>
+
     <div id="errorMsg" class="error-msg" style="display:none"></div>
 
     <div class="history" id="historyBlock" style="display:none">
@@ -383,6 +404,7 @@
     let lastMobileFinalText = '';
     let lastMobileFinalAt = 0;
     let watchdogTimer = null;
+    const STORAGE_KEY = 'dhikr-counter-state-v1';
 
     const countNum = document.getElementById('countNum');
     const ring = document.getElementById('ring');
@@ -437,6 +459,40 @@
       }
     }
 
+    function saveState() {
+      try {
+        const state = {
+          selectedDhikr: currentDhikrKey(),
+          countByDhikr,
+          sessionsByDhikr
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        // Ignore storage failures (private mode, quota, etc.)
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.countByDhikr && typeof parsed.countByDhikr === 'object') {
+            countByDhikr = parsed.countByDhikr;
+          }
+          if (parsed.sessionsByDhikr && typeof parsed.sessionsByDhikr === 'object') {
+            sessionsByDhikr = parsed.sessionsByDhikr;
+          }
+          if (typeof parsed.selectedDhikr === 'string' && dhikrMap[parsed.selectedDhikr]) {
+            dhikrSelect.value = parsed.selectedDhikr;
+          }
+        }
+      } catch (e) {
+        // Ignore malformed JSON or storage access errors.
+      }
+    }
+
     function dhikrLabelByKey(key) {
       const option = [...dhikrSelect.options].find(o => o.value === key);
       return option ? option.text : key;
@@ -456,6 +512,7 @@
       renderHistoryAccordion();
     }
 
+    loadState();
     ensureDhikrState();
 
     ring.addEventListener('click', manualCount);
@@ -474,6 +531,7 @@
       lastMobileFinalAt = 0;
       syncCurrentDhikrStateToUi();
       statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
+      saveState();
     });
 
     function countDhikrInTranscript(transcript) {
@@ -490,6 +548,7 @@
       ring.classList.add('pulse');
       setTimeout(() => ring.classList.remove('pulse'), 500);
       renderHistoryAccordion();
+      saveState();
     }
 
     function manualCount() {
@@ -558,6 +617,35 @@
           </div>
         </details>`;
       }).join('');
+    }
+
+    function clearCurrentDhikrData() {
+      const key = currentDhikrKey();
+      const label = dhikrLabelByKey(key);
+      const ok = window.confirm('Clear all saved data for "' + label + '"? This cannot be undone.');
+      if (!ok) return;
+
+      countByDhikr[key] = 0;
+      sessionsByDhikr[key] = [];
+      count = 0;
+      countNum.textContent = 0;
+      saveState();
+      renderHistoryAccordion();
+      statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
+    }
+
+    function clearAllData() {
+      const ok = window.confirm('Clear ALL dhikr counts and history? This cannot be undone.');
+      if (!ok) return;
+
+      countByDhikr = {};
+      sessionsByDhikr = {};
+      ensureDhikrState();
+      count = 0;
+      countNum.textContent = 0;
+      saveState();
+      renderHistoryAccordion();
+      statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
     }
 
     function toggleListen() {
@@ -711,6 +799,7 @@
       startBtn.classList.remove('on');
     }
 
+    arabicText.textContent = currentDhikr().arabic;
     syncCurrentDhikrStateToUi();
   </script>
 </body>
