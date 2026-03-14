@@ -293,6 +293,7 @@
     let sessions = [];
     const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     let resultSlotMaxCounts = {};
+    let mobileProcessedFinalIndices = {};
     let lastMobileFinalText = '';
     let lastMobileFinalAt = 0;
     let watchdogTimer = null;
@@ -367,6 +368,7 @@
 
       r.onstart = () => {
         resultSlotMaxCounts = {};
+        mobileProcessedFinalIndices = {};
         lastMobileFinalText = '';
         lastMobileFinalAt = 0;
         resetWatchdog();
@@ -383,23 +385,25 @@
           for (let i = e.resultIndex; i < e.results.length; i++) {
             const result = e.results[i];
             if (!result.isFinal) continue;
+            if (mobileProcessedFinalIndices[i]) continue;
 
             const transcript = result[0].transcript;
             const occurrences = countDhikrInTranscript(transcript);
+            mobileProcessedFinalIndices[i] = true;
             if (occurrences <= 0) continue;
 
             const normalized = transcript.toLowerCase().replace(/\s+/g, ' ').trim();
             const now = Date.now();
-            const isDuplicateEcho = normalized === lastMobileFinalText && (now - lastMobileFinalAt) < 1200;
+            const isDuplicateEcho = normalized === lastMobileFinalText && (now - lastMobileFinalAt) < 450;
             if (isDuplicateEcho) continue;
 
-            // Mobile-safe strategy: count at most +1 per finalized phrase.
-            updateCount(count + 1);
+            // Count all detected occurrences in this finalized phrase.
+            updateCount(count + occurrences);
             lastMobileFinalText = normalized;
             lastMobileFinalAt = now;
 
             dot.className = 'dot detected';
-            statusText.textContent = '+1 counted';
+            statusText.textContent = '+' + occurrences + ' counted';
             setTimeout(() => {
               if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
             }, 350);
