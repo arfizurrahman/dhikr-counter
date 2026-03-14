@@ -291,7 +291,7 @@
     let isListening = false;
     let recognition = null;
     let sessions = [];
-    let lastProcessedFinalIndex = -1;
+    let resultSlotMaxCounts = {};
     let watchdogTimer = null;
 
     const countNum = document.getElementById('countNum');
@@ -349,7 +349,7 @@
       r.lang = 'ar-SA';
       // Restoring to continuous = true, which PC Chrome heavily preferred for fluidity
       r.continuous = true; 
-      r.interimResults = false;
+      r.interimResults = true;
       r.maxAlternatives = 1;
 
       // Watchdog aggressively forces a clear/restart to prevent freezing.
@@ -359,11 +359,11 @@
           if (isListening && r) {
             try { r.stop(); } catch(e) {}
           }
-        }, 2500); // reduced to 2.5 seconds to forcefully clear out stale buffers quicker
+        }, 5000);
       }
 
       r.onstart = () => {
-        lastProcessedFinalIndex = -1;
+        resultSlotMaxCounts = {};
         resetWatchdog();
         dot.className = 'dot active';
         statusText.textContent = 'Listening…';
@@ -375,20 +375,27 @@
         resetWatchdog();
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const result = e.results[i];
-          if (!result.isFinal || i <= lastProcessedFinalIndex) continue;
-
           const transcript = result[0].transcript;
           const occurrences = countDhikrInTranscript(transcript);
-          if (occurrences > 0) {
-            updateCount(count + occurrences);
+          const previousMax = resultSlotMaxCounts[i] || 0;
+
+          // Count only positive deltas per recognition slot.
+          // This captures fast repeats in interim updates without double-counting old text.
+          if (occurrences > previousMax) {
+            const delta = occurrences - previousMax;
+            updateCount(count + delta);
+            resultSlotMaxCounts[i] = occurrences;
             dot.className = 'dot detected';
-            statusText.textContent = '+' + occurrences + ' counted';
+            statusText.textContent = '+' + delta + ' counted';
             setTimeout(() => {
               if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
             }, 350);
           }
 
-          lastProcessedFinalIndex = i;
+          // Keep slot maxima even after finalization so repeated callbacks cannot recount it.
+          if (result.isFinal && !(i in resultSlotMaxCounts)) {
+            resultSlotMaxCounts[i] = occurrences;
+          }
         }
       };
 
