@@ -306,10 +306,9 @@
     function countOccurrences(transcript) {
       if (!transcript) return 0;
       const t = transcript.toLowerCase();
-      // Only require the main recognizable chunk. 
-      // Removed overly generous loose fragments that caused mobile double-counts, 
-      // but kept enough leniency to easily catch rapid succession on desktop.
-      const matches = t.match(/(استغفرالله|أستغفرالله|فاستغفر|يستغفر|استغفر|أستغفر|ستغفر|اسغفر)/g);
+      // Most strict mode: we only accept full, proper words now to prevent mobile hallucination double-counts.
+      // E.g. If mobile says "استغفر" + "الله" in the same breath, we want it to count as ONE, not two.
+      const matches = t.match(/(استغفر\s*الله|أستغفر\s*الله|استغفر|أستغفر|فاستغفر|يستغفر|استغفرالله|أستغفرالله)/g);
       return matches ? matches.length : 0;
     }
 
@@ -384,7 +383,11 @@
         // We explicitly use i = e.resultIndex for mobile stabilization,
         // BUT we accumulate to a global count to fix the PC "freeze at 1" bug
         for (let i = 0; i < e.results.length; i++) {
-          builtText += e.results[i][0].transcript + ' ';
+          // Mobile Safari/Chrome often provides duplicates across interim results.
+          // By only using finalized results (or the single latest interim result), we eliminate duplication.
+          if (e.results[i].isFinal || i === e.results.length - 1) {
+            builtText += e.results[i][0].transcript + ' ';
+          }
         }
         
         currentBufferMatches = countOccurrences(builtText);
