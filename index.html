@@ -291,7 +291,10 @@
     let isListening = false;
     let recognition = null;
     let sessions = [];
+    const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
     let resultSlotMaxCounts = {};
+    let lastMobileFinalText = '';
+    let lastMobileFinalAt = 0;
     let watchdogTimer = null;
 
     const countNum = document.getElementById('countNum');
@@ -349,7 +352,7 @@
       r.lang = 'ar-SA';
       // Restoring to continuous = true, which PC Chrome heavily preferred for fluidity
       r.continuous = true; 
-      r.interimResults = true;
+      r.interimResults = !isMobileDevice;
       r.maxAlternatives = 1;
 
       // Watchdog aggressively forces a clear/restart to prevent freezing.
@@ -364,6 +367,8 @@
 
       r.onstart = () => {
         resultSlotMaxCounts = {};
+        lastMobileFinalText = '';
+        lastMobileFinalAt = 0;
         resetWatchdog();
         dot.className = 'dot active';
         statusText.textContent = 'Listening…';
@@ -373,6 +378,35 @@
 
       r.onresult = (e) => {
         resetWatchdog();
+
+        if (isMobileDevice) {
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            const result = e.results[i];
+            if (!result.isFinal) continue;
+
+            const transcript = result[0].transcript;
+            const occurrences = countDhikrInTranscript(transcript);
+            if (occurrences <= 0) continue;
+
+            const normalized = transcript.toLowerCase().replace(/\s+/g, ' ').trim();
+            const now = Date.now();
+            const isDuplicateEcho = normalized === lastMobileFinalText && (now - lastMobileFinalAt) < 1200;
+            if (isDuplicateEcho) continue;
+
+            // Mobile-safe strategy: count at most +1 per finalized phrase.
+            updateCount(count + 1);
+            lastMobileFinalText = normalized;
+            lastMobileFinalAt = now;
+
+            dot.className = 'dot detected';
+            statusText.textContent = '+1 counted';
+            setTimeout(() => {
+              if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
+            }, 350);
+          }
+          return;
+        }
+
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const result = e.results[i];
           const transcript = result[0].transcript;
