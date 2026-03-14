@@ -78,7 +78,33 @@
       font-size: 13px;
       color: var(--text2);
       text-align: center;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .selector-wrap {
+      width: 100%;
+      margin-bottom: 1.3rem;
+    }
+
+    .selector-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text2);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .dhikr-select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
     }
 
     .ring {
@@ -94,6 +120,9 @@
       margin-bottom: 1.8rem;
       transition: border-color 0.3s, background 0.3s;
       position: relative;
+      cursor: pointer;
+      user-select: none;
+      touch-action: manipulation;
     }
 
     .ring.listening {
@@ -227,6 +256,50 @@
       margin-bottom: 10px;
     }
 
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .accordion-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface2);
+      overflow: hidden;
+    }
+
+    .accordion-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text);
+      font-size: 13px;
+      user-select: none;
+    }
+
+    .accordion-summary::-webkit-details-marker { display: none; }
+
+    .accordion-title {
+      font-weight: 500;
+    }
+
+    .accordion-total {
+      color: var(--green-dark);
+      font-weight: 600;
+    }
+
+    .accordion-content {
+      border-top: 1px solid var(--border);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
     .sessions { display: flex; flex-direction: column; gap: 6px; }
 
     .session-item {
@@ -257,14 +330,25 @@
 <body>
   <div class="card">
     <div class="app-title">Dhikr Counter</div>
-    <div class="app-sub">Say "Astaghfirullah" — it will be counted</div>
+    <div class="app-sub">Choose a dhikr, say it, or tap the circle</div>
 
-    <div class="ring" id="ring">
+    <div class="selector-wrap">
+      <label class="selector-label" for="dhikrSelect">Dhikr</label>
+      <select id="dhikrSelect" class="dhikr-select">
+        <option value="astaghfirullah">Astaghfirullah</option>
+        <option value="subhanallah">Subhanallah</option>
+        <option value="alhamdulillah">Alhamdulillah</option>
+        <option value="allahuakbar">Allahu Akbar</option>
+        <option value="lailahaillallah">La ilaha illallah</option>
+      </select>
+    </div>
+
+    <div class="ring" id="ring" role="button" tabindex="0" aria-label="Tap to count once">
       <div class="count-num" id="countNum">0</div>
       <div class="count-label">times</div>
     </div>
 
-    <div class="arabic">أَسْتَغْفِرُ اللَّهَ</div>
+    <div class="arabic" id="arabicText">أَسْتَغْفِرُ اللَّهَ</div>
 
     <div class="status-row">
       <div class="dot" id="dot"></div>
@@ -279,8 +363,8 @@
     <div id="errorMsg" class="error-msg" style="display:none"></div>
 
     <div class="history" id="historyBlock" style="display:none">
-      <div class="history-title">Session history</div>
-      <div class="sessions" id="sessionList"></div>
+      <div class="history-title">All dhikr history</div>
+      <div class="accordion" id="historyAccordion"></div>
     </div>
 
     <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required</div>
@@ -290,8 +374,9 @@
     let count = 0;
     let isListening = false;
     let recognition = null;
-    let sessions = [];
     const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    let countByDhikr = {};
+    let sessionsByDhikr = {};
     let resultSlotMaxCounts = {};
     let mobileProcessedFinalIndices = {};
     let lastMobileFinalText = '';
@@ -305,42 +390,169 @@
     const startBtn = document.getElementById('startBtn');
     const errorMsg = document.getElementById('errorMsg');
     const historyBlock = document.getElementById('historyBlock');
-    const sessionList = document.getElementById('sessionList');
+    const historyAccordion = document.getElementById('historyAccordion');
+    const dhikrSelect = document.getElementById('dhikrSelect');
+    const arabicText = document.getElementById('arabicText');
+
+    const dhikrMap = {
+      astaghfirullah: {
+        arabic: 'أَسْتَغْفِرُ اللَّهَ',
+        regex: /(استغفر\s*الله|أستغفر\s*الله|استغفرالله|أستغفرالله|استغفر|أستغفر|فاستغفر|يستغفر)/g
+      },
+      subhanallah: {
+        arabic: 'سُبْحَانَ اللَّهِ',
+        regex: /(سبحان\s*الله|سبحانالله|سبحان)/g
+      },
+      alhamdulillah: {
+        arabic: 'الْحَمْدُ لِلَّهِ',
+        regex: /(الحمد\s*لله|الحمدلله|الحمد)/g
+      },
+      allahuakbar: {
+        arabic: 'اللَّهُ أَكْبَرُ',
+        regex: /(الله\s*أكبر|الله\s*اكبر|اللهأكبر|اللهاكبر)/g
+      },
+      lailahaillallah: {
+        arabic: 'لَا إِلَٰهَ إِلَّا اللَّهُ',
+        regex: /(لا\s*إله\s*إلا\s*الله|لا\s*اله\s*الا\s*الله|لاإلهإلاالله|لاالهالاالله)/g
+      }
+    };
+
+    function currentDhikr() {
+      return dhikrMap[dhikrSelect.value] || dhikrMap.astaghfirullah;
+    }
+
+    function currentDhikrKey() {
+      return dhikrSelect.value;
+    }
+
+    function ensureDhikrState() {
+      for (const key of Object.keys(dhikrMap)) {
+        if (typeof countByDhikr[key] !== 'number') countByDhikr[key] = 0;
+        if (!Array.isArray(sessionsByDhikr[key])) sessionsByDhikr[key] = [];
+      }
+    }
+
+    function dhikrLabelByKey(key) {
+      const option = [...dhikrSelect.options].find(o => o.value === key);
+      return option ? option.text : key;
+    }
+
+    function totalForDhikr(key) {
+      const live = countByDhikr[key] || 0;
+      const sessions = sessionsByDhikr[key] || [];
+      const archived = sessions.reduce((sum, s) => sum + s.count, 0);
+      return live + archived;
+    }
+
+    function syncCurrentDhikrStateToUi() {
+      const key = currentDhikrKey();
+      count = countByDhikr[key] || 0;
+      countNum.textContent = count;
+      renderHistoryAccordion();
+    }
+
+    ensureDhikrState();
+
+    ring.addEventListener('click', manualCount);
+    ring.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        manualCount();
+      }
+    });
+
+    dhikrSelect.addEventListener('change', () => {
+      arabicText.textContent = currentDhikr().arabic;
+      resultSlotMaxCounts = {};
+      mobileProcessedFinalIndices = {};
+      lastMobileFinalText = '';
+      lastMobileFinalAt = 0;
+      syncCurrentDhikrStateToUi();
+      statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
+    });
 
     function countDhikrInTranscript(transcript) {
       if (!transcript) return 0;
       const t = transcript.toLowerCase().replace(/\s+/g, ' ').trim();
-      const matches = t.match(/(استغفر\s*الله|أستغفر\s*الله|استغفرالله|أستغفرالله|استغفر|أستغفر|فاستغفر|يستغفر)/g);
+      const matches = t.match(currentDhikr().regex);
       return matches ? matches.length : 0;
     }
 
     function updateCount(n) {
       count = n;
+      countByDhikr[currentDhikrKey()] = n;
       countNum.textContent = n;
       ring.classList.add('pulse');
       setTimeout(() => ring.classList.remove('pulse'), 500);
+      renderHistoryAccordion();
+    }
+
+    function manualCount() {
+      updateCount(count + 1);
+      dot.className = 'dot detected';
+      statusText.textContent = '+1 counted (manual)';
+      setTimeout(() => {
+        if (isListening) {
+          dot.className = 'dot active';
+          statusText.textContent = 'Listening…';
+        } else {
+          dot.className = 'dot';
+          statusText.textContent = 'Press "Start" to begin';
+        }
+      }, 300);
     }
 
     function resetCount() {
+      const key = currentDhikrKey();
+      const currentSessions = sessionsByDhikr[key] || [];
       if (count > 0) {
         const now = new Date();
-        sessions.unshift({
+        currentSessions.unshift({
           count,
           time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         });
-        if (sessions.length > 5) sessions.pop();
-        renderSessions();
+        if (currentSessions.length > 5) currentSessions.pop();
+        sessionsByDhikr[key] = currentSessions;
       }
-      count = 0;
-      countNum.textContent = 0;
+      updateCount(0);
+      renderHistoryAccordion();
     }
 
-    function renderSessions() {
-      if (sessions.length === 0) { historyBlock.style.display = 'none'; return; }
+    function renderHistoryAccordion() {
+      const performedKeys = Object.keys(dhikrMap).filter(key => {
+        const live = countByDhikr[key] || 0;
+        const sessions = sessionsByDhikr[key] || [];
+        return live > 0 || sessions.length > 0;
+      });
+
+      if (performedKeys.length === 0) {
+        historyBlock.style.display = 'none';
+        historyAccordion.innerHTML = '';
+        return;
+      }
+
       historyBlock.style.display = 'block';
-      sessionList.innerHTML = sessions.map(s =>
-        `<div class="session-item"><span>${s.time}</span><span class="session-count">${s.count}×</span></div>`
-      ).join('');
+      historyAccordion.innerHTML = performedKeys.map((key) => {
+        const live = countByDhikr[key] || 0;
+        const sessions = sessionsByDhikr[key] || [];
+        const total = totalForDhikr(key);
+        const liveItem = live > 0
+          ? `<div class="session-item"><span>Current</span><span class="session-count">${live}×</span></div>`
+          : '';
+        const sessionItems = sessions.map(s =>
+          `<div class="session-item"><span>${s.time}</span><span class="session-count">${s.count}×</span></div>`
+        ).join('');
+        const openAttr = key === currentDhikrKey() ? ' open' : '';
+        return `<details class="accordion-item"${openAttr}>
+          <summary class="accordion-summary">
+            <span class="accordion-title">${dhikrLabelByKey(key)}</span>
+            <span class="accordion-total">${total}×</span>
+          </summary>
+          <div class="accordion-content">
+            ${liveItem}${sessionItems}
+          </div>
+        </details>`;
+      }).join('');
     }
 
     function toggleListen() {
@@ -493,6 +705,8 @@
       startBtn.textContent = 'Start listening';
       startBtn.classList.remove('on');
     }
+
+    syncCurrentDhikrStateToUi();
   </script>
 </body>
 </html>
