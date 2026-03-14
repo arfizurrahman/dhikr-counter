@@ -291,7 +291,7 @@
     let isListening = false;
     let recognition = null;
     let sessions = [];
-    let phraseMax = 0;
+    let lastProcessedFinalIndex = -1;
     let watchdogTimer = null;
 
     const countNum = document.getElementById('countNum');
@@ -303,12 +303,10 @@
     const historyBlock = document.getElementById('historyBlock');
     const sessionList = document.getElementById('sessionList');
 
-    function countOccurrences(transcript) {
+    function countDhikrInTranscript(transcript) {
       if (!transcript) return 0;
-      const t = transcript.toLowerCase();
-      // Most strict mode: we only accept full, proper words now to prevent mobile hallucination double-counts.
-      // E.g. If mobile says "استغفر" + "الله" in the same breath, we want it to count as ONE, not two.
-      const matches = t.match(/(استغفر\s*الله|أستغفر\s*الله|استغفر|أستغفر|فاستغفر|يستغفر|استغفرالله|أستغفرالله)/g);
+      const t = transcript.toLowerCase().replace(/\s+/g, ' ').trim();
+      const matches = t.match(/(استغفر\s*الله|أستغفر\s*الله|استغفرالله|أستغفرالله|استغفر|أستغفر|فاستغفر|يستغفر)/g);
       return matches ? matches.length : 0;
     }
 
@@ -351,7 +349,7 @@
       r.lang = 'ar-SA';
       // Restoring to continuous = true, which PC Chrome heavily preferred for fluidity
       r.continuous = true; 
-      r.interimResults = true;
+      r.interimResults = false;
       r.maxAlternatives = 1;
 
       // Watchdog aggressively forces a clear/restart to prevent freezing.
@@ -365,7 +363,7 @@
       }
 
       r.onstart = () => {
-        phraseMax = 0;
+        lastProcessedFinalIndex = -1;
         resetWatchdog();
         dot.className = 'dot active';
         statusText.textContent = 'Listening…';
@@ -375,41 +373,22 @@
 
       r.onresult = (e) => {
         resetWatchdog();
-        
-        let currentBufferMatches = 0;
-        let builtText = '';
-        
-        // Loop through the entire session's buffer. 
-        // We explicitly use i = e.resultIndex for mobile stabilization,
-        // BUT we accumulate to a global count to fix the PC "freeze at 1" bug
-        for (let i = 0; i < e.results.length; i++) {
-          // Mobile Safari/Chrome often provides duplicates across interim results.
-          // By only using finalized results (or the single latest interim result), we eliminate duplication.
-          if (e.results[i].isFinal || i === e.results.length - 1) {
-            builtText += e.results[i][0].transcript + ' ';
-          }
-        }
-        
-        currentBufferMatches = countOccurrences(builtText);
-        
-        if (currentBufferMatches > phraseMax) {
-          const shift = currentBufferMatches - phraseMax;
-          updateCount(count + shift);
-          phraseMax = currentBufferMatches;
-          
-          dot.className = 'dot detected';
-          statusText.textContent = '+ ' + shift + ' counted!';
-          setTimeout(() => {
-            if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
-          }, 350);
-        }
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const result = e.results[i];
+          if (!result.isFinal || i <= lastProcessedFinalIndex) continue;
 
-        // Extremely important specifically for PC Chrome: 
-        // If the array grows too large while "continuous" is true, PC Chrome stops firing `onresult`.
-        // By forcibly stopping the API after 5 items, we seamlessly trigger `onend` to flush the memory 
-        // and instantly restart it. This completely eliminates the PC "freeze" you were feeling.
-        if (e.results.length > 5 && isListening) {
-           try { r.stop(); } catch(err) {} 
+          const transcript = result[0].transcript;
+          const occurrences = countDhikrInTranscript(transcript);
+          if (occurrences > 0) {
+            updateCount(count + occurrences);
+            dot.className = 'dot detected';
+            statusText.textContent = '+' + occurrences + ' counted';
+            setTimeout(() => {
+              if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
+            }, 350);
+          }
+
+          lastProcessedFinalIndex = i;
         }
       };
 
@@ -425,10 +404,8 @@
       };
 
       r.onend = () => {
-        // Since continuous=false, the browser closes the session rapidly after a few seconds.
-        // We seamlessly, silently restart it instantly.
+        // Restart seamlessly whenever the browser closes the recognition stream.
         if (isListening) {
-          phraseMax = 0; // Wipe the slate clean for the next short burst 
           try { r.start(); } catch(err) {
             setTimeout(() => { if(isListening) try { r.start(); } catch(e){} }, 200);
           }
