@@ -283,7 +283,7 @@
       <div class="sessions" id="sessionList"></div>
     </div>
 
-    <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required<br><br><b>Important Setup Note:</b> For your microphone to stay connected without asking for permission every time, you must run this over a local server (like the VS Code <b>Live Server</b> extension), <i>not</i> just by double clicking the file.</div>
+    <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required</div>
   </div>
 
   <script>
@@ -291,6 +291,8 @@
     let isListening = false;
     let recognition = null;
     let sessions = [];
+    let phraseMax = 0;
+    let watchdogTimer = null;
 
     const countNum = document.getElementById('countNum');
     const ring = document.getElementById('ring');
@@ -302,9 +304,11 @@
     const sessionList = document.getElementById('sessionList');
 
     function countOccurrences(transcript) {
-      // Create a regex to find multiple occurrences of the word in a single long sentence
-      // This allows you to say it quickly one right after the other
-      const matches = transcript.match(/(استغفر|أستغفر|astagh|astag|istag)/gi);
+      if (!transcript) return 0;
+      const t = transcript.toLowerCase();
+      // Expanded to catch fast/slurred speech fragments (longest matches first)
+      // When speaking quickly, the mic often only catches half the word (e.g. "استغف" or just "غفر")
+      const matches = t.match(/(استغفرالله|أستغفرالله|فاستغفر|يستغفر|استغفر|أستغفر|ستغفر|اسغفر|تغفر|اغفر|استغف|أستغف|اسغف|استغ|أستغ|غفر)/g);
       return matches ? matches.length : 0;
     }
 
@@ -341,75 +345,116 @@
       isListening ? stopListening() : startListening();
     }
 
+    function createRecognition() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const r = new SR();
+      // Use Arabic language directly since user requested it
+      r.lang = 'ar-SA';
+      r.continuous = true; 
+      r.interimResults = true;
+      r.maxAlternatives = 1;
+
+      // Chrome speech API freezes randomly if left open too long or it hears nothing. 
+      // Watchdog aggressively forces a clear/restart to prevent freezing.
+      function resetWatchdog() {
+        clearTimeout(watchdogTimer);
+        watchdogTimer = setTimeout(() => {
+          if (isListening && r) {
+            try { r.stop(); } catch(e) {}
+          }
+        }, 3500); // 3.5 seconds of silence flushes the bugged Chrome API buffer
+      }
+
+      r.onstart = () => {
+        phraseMax = 0;
+        resetWatchdog();
+        dot.className = 'dot active';
+        statusText.textContent = 'Listening…';
+        ring.classList.add('listening');
+        startBtn.textContent = 'Stop listening';
+      };
+
+      r.onresult = (e) => {
+        resetWatchdog();
+        let fullTranscript = '';
+        let foundMatches = 0;
+        
+        // Sum up all results in the continuous session
+        for (let i = 0; i < e.results.length; i++) {
+          const text = e.results[i][0].transcript;
+          fullTranscript += text + ' ';
+          foundMatches += countOccurrences(text);
+        }
+        
+        // If the number of detected occurrences went up right now, add difference to UI immediately
+        if (foundMatches > phraseMax) {
+          const newCounts = foundMatches - phraseMax;
+          updateCount(count + newCounts);
+          phraseMax = foundMatches;
+          
+          dot.className = 'dot detected';
+          statusText.textContent = '+ ' + newCounts + ' counted!';
+          setTimeout(() => {
+            if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
+          }, 600);
+        }
+
+        // Prevent memory leak/freezing - if chrome buffers too many items, cut it and restart
+        if (e.results.length > 15 && isListening) {
+           try { r.stop(); } catch(err) {} 
+        }
+      };
+
+      r.onerror = (e) => {
+        if (e.error !== 'no-speech') {
+          console.warn('Speech error:', e.error);
+        }
+        if (e.error === 'not-allowed') {
+          errorMsg.textContent = 'Microphone access denied. Please allow microphone in browser settings.';
+          errorMsg.style.display = 'block';
+          stopListening();
+        }
+      };
+
+      r.onend = () => {
+        // If the engine times out or closes organically, restart it seamlessly
+        if (isListening) {
+          phraseMax = 0; // Reset our tracker for the new session
+          setTimeout(() => {
+            if (isListening) { try { r.start(); } catch(e) {} }
+          }, 250);
+        }
+      };
+
+      return r;
+    }
+
     function startListening() {
+      if (isListening) return;
+
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) {
         errorMsg.textContent = 'Speech recognition is not supported in your browser. Please use Chrome or Edge.';
         errorMsg.style.display = 'block';
         return;
       }
+
       errorMsg.style.display = 'none';
-      recognition = new SR();
-      recognition.lang = 'ar-SA';
-      recognition.continuous = true;
-      recognition.interimResults = true;
+      isListening = true;
+      startBtn.textContent = 'Starting up...';
+      startBtn.classList.add('on');
 
-      recognition.onstart = () => {
-        isListening = true;
-        dot.className = 'dot active';
-        statusText.textContent = 'Listening…';
-        ring.classList.add('listening');
-        startBtn.textContent = 'Stop listening';
-        startBtn.classList.add('on');
-      };
+      if (recognition) {
+        try { recognition.stop(); } catch(e) {}
+      }
 
-      recognition.onresult = (e) => {
-        let detectedInterim = false;
-        
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          const result = e.results[i];
-          const transcript = result[0].transcript;
-          
-          const numMatches = countOccurrences(transcript);
-          
-          if (result.isFinal) {
-            console.log('Final Heard:', transcript, 'Matches:', numMatches);
-            if (numMatches > 0) {
-              updateCount(count + numMatches);
-              dot.className = 'dot detected';
-              statusText.textContent = 'Counted! Keep going…';
-              setTimeout(() => {
-                if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
-              }, 1000);
-            }
-          } else {
-            // Provide visual feedback while you are speaking without incrementing the actual number yet
-            if (numMatches > 0) {
-              detectedInterim = true;
-            }
-          }
-        }
-        
-        if (detectedInterim) {
-          statusText.textContent = 'Hearing you...';
-          dot.className = 'dot detected';
-        }
-      };
-
-      recognition.onerror = (e) => {
-        if (e.error === 'not-allowed') {
-          errorMsg.textContent = 'Microphone access denied. Please allow microphone access in your browser settings.';
-          errorMsg.style.display = 'block';
-          stopListening();
-        }
-      };
-
-      recognition.onend = () => { if (isListening) recognition.start(); };
+      recognition = createRecognition();
       recognition.start();
     }
 
     function stopListening() {
       isListening = false;
+      clearTimeout(watchdogTimer);
       if (recognition) { recognition.onend = null; recognition.stop(); recognition = null; }
       dot.className = 'dot';
       statusText.textContent = 'Stopped. Press "Start" to resume.';
