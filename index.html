@@ -45,12 +45,31 @@
       color: var(--text);
       font-family: 'DM Sans', sans-serif;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
     }
 
     body {
       padding: 2rem 1rem;
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    @media (min-width: 850px) {
+      body {
+        align-items: center;
+      }
+      .app-container {
+        flex-direction: row;
+        max-width: 850px;
+        align-items: flex-start;
+      }
     }
 
     .card {
@@ -59,10 +78,42 @@
       border-radius: 20px;
       padding: 2.5rem 2rem 2.5rem;
       width: 100%;
-      max-width: 400px;
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex: 1;
+    }
+
+    .history-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem 2.5rem;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    @media (min-width: 850px) {
+      .history-card {
+        height: 100%;
+        max-height: 800px;
+        overflow-y: auto;
+      }
+      
+      /* Hide the inline history inside .card if big screen */
+      .card .history {
+        display: none !important;
+      }
+    }
+
+    /* We hide the standalone history-card on mobile */
+    @media (max-width: 849px) {
+      .app-container > .history-card {
+        display: none !important;
+      }
     }
 
     .app-title {
@@ -406,57 +457,66 @@
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="app-title">Dhikr Counter</div>
-    <div class="app-sub" id="instructionBox" tabindex="0">
-      <button class="close-instruction" id="closeInstructionBtn" aria-label="Dismiss instructions">×</button>
-      <span style="display:block; font-weight:700; color:var(--green); margin-bottom: 2px;">Start Here</span>
-      <span style="font-size: 13px; color:var(--text2);">Choose a dhikr, then say it or tap the circle</span>
+  <div class="app-container">
+    <div class="card">
+      <div class="app-title">Dhikr Counter</div>
+      <div class="app-sub" id="instructionBox" tabindex="0">
+        <button class="close-instruction" id="closeInstructionBtn" aria-label="Dismiss instructions">×</button>
+        <span style="display:block; font-weight:700; color:var(--green); margin-bottom: 2px;">Start Here</span>
+        <span style="font-size: 13px; color:var(--text2);">Choose a dhikr, then say it or tap the circle</span>
+      </div>
+
+      <div class="selector-wrap">
+        <label class="selector-label" for="dhikrSelect">Dhikr</label>
+        <select id="dhikrSelect" class="dhikr-select">
+          <option value="astaghfirullah">Astaghfirullah</option>
+          <option value="subhanallah">Subhanallah</option>
+          <option value="alhamdulillah">Alhamdulillah</option>
+          <option value="allahuakbar">Allahu Akbar</option>
+          <option value="lailahaillallah">La ilaha illallah</option>
+          <option value="sallallahu_alaihi_wasallam">Sallallahu alaihi wasallam (Darood)</option>
+        </select>
+      </div>
+
+      <div class="ring" id="ring" role="button" tabindex="0" aria-label="Tap to count once">
+        <div class="count-num" id="countNum">0</div>
+        <div class="count-label">times</div>
+      </div>
+
+      <div class="arabic" id="arabicText">أَسْتَغْفِرُ اللَّهَ</div>
+
+      <div class="status-row">
+        <div class="dot" id="dot"></div>
+        <span id="statusText">Press "Start" to begin</span>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn primary" id="startBtn" onclick="toggleListen()">Start listening</button>
+        <button class="btn" onclick="resetCount()">Reset</button>
+      </div>
+
+      <div class="data-actions">
+        <button class="btn danger" onclick="clearCurrentDhikrData()">Clear this dhikr</button>
+        <button class="btn danger" onclick="clearAllData()">Clear all data</button>
+      </div>
+
+      <div id="errorMsg" class="error-msg" style="display:none"></div>
+
+      <!-- Mobile/Inline History -->
+      <div class="history" id="historyBlock" style="display:none">
+        <div class="history-title">All dhikr history</div>
+        <div class="accordion" id="historyAccordion"></div>
+      </div>
+
+      <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required</div>
+    </div> <!-- /.card -->
+
+    <!-- Desktop Sidebar History -->
+    <div class="history-card" id="desktopHistoryCard">
+      <div class="history-title" style="margin-bottom: 1rem; font-size:18px;">All dhikr history</div>
+      <div class="accordion" id="desktopHistoryAccordion"></div>
     </div>
-
-    <div class="selector-wrap">
-      <label class="selector-label" for="dhikrSelect">Dhikr</label>
-      <select id="dhikrSelect" class="dhikr-select">
-        <option value="astaghfirullah">Astaghfirullah</option>
-        <option value="subhanallah">Subhanallah</option>
-        <option value="alhamdulillah">Alhamdulillah</option>
-        <option value="allahuakbar">Allahu Akbar</option>
-        <option value="lailahaillallah">La ilaha illallah</option>
-        <option value="sallallahu_alaihi_wasallam">Sallallahu alaihi wasallam (Darood)</option>
-      </select>
-    </div>
-
-    <div class="ring" id="ring" role="button" tabindex="0" aria-label="Tap to count once">
-      <div class="count-num" id="countNum">0</div>
-      <div class="count-label">times</div>
-    </div>
-
-    <div class="arabic" id="arabicText">أَسْتَغْفِرُ اللَّهَ</div>
-
-    <div class="status-row">
-      <div class="dot" id="dot"></div>
-      <span id="statusText">Press "Start" to begin</span>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn primary" id="startBtn" onclick="toggleListen()">Start listening</button>
-      <button class="btn" onclick="resetCount()">Reset</button>
-    </div>
-
-    <div class="data-actions">
-      <button class="btn danger" onclick="clearCurrentDhikrData()">Clear this dhikr</button>
-      <button class="btn danger" onclick="clearAllData()">Clear all data</button>
-    </div>
-
-    <div id="errorMsg" class="error-msg" style="display:none"></div>
-
-    <div class="history" id="historyBlock" style="display:none">
-      <div class="history-title">All dhikr history</div>
-      <div class="accordion" id="historyAccordion"></div>
-    </div>
-
-    <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required</div>
-  </div>
+  </div> <!-- /.app-container -->
 
   <script>
     let count = 0;
@@ -480,6 +540,8 @@
     const errorMsg = document.getElementById('errorMsg');
     const historyBlock = document.getElementById('historyBlock');
     const historyAccordion = document.getElementById('historyAccordion');
+    const desktopHistoryCard = document.getElementById('desktopHistoryCard');
+    const desktopHistoryAccordion = document.getElementById('desktopHistoryAccordion');
     const dhikrSelect = document.getElementById('dhikrSelect');
     const arabicText = document.getElementById('arabicText');
     const instructionBox = document.getElementById('instructionBox');
@@ -671,12 +733,15 @@
 
       if (performedKeys.length === 0) {
         historyBlock.style.display = 'none';
+        desktopHistoryCard.style.display = 'flex';
         historyAccordion.innerHTML = '';
+        desktopHistoryAccordion.innerHTML = '<div style="color:var(--text2); text-align:center; margin-top:2rem;">No history yet. Start counting!</div>';
         return;
       }
 
       historyBlock.style.display = 'block';
-      historyAccordion.innerHTML = performedKeys.map((key) => {
+      desktopHistoryCard.style.display = 'flex';
+      const htmlContent = performedKeys.map((key) => {
         const live = countByDhikr[key] || 0;
         const sessions = sessionsByDhikr[key] || [];
         const total = totalForDhikr(key);
@@ -700,6 +765,9 @@
           </div>
         </details>`;
       }).join('');
+      
+      historyAccordion.innerHTML = htmlContent;
+      desktopHistoryAccordion.innerHTML = htmlContent;
     }
 
     function removeDhikrDataFromAccordion(event, key) {
