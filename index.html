@@ -205,18 +205,39 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin-bottom: 1.8rem;
-      transition: border-color 0.3s, background 0.3s;
+      margin-bottom: 2rem;
+      transition: border-color 0.3s, background 0.3s, transform 0.1s;
       position: relative;
       cursor: pointer;
       user-select: none;
       touch-action: manipulation;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+    
+    .ring::after {
+      content: 'TAP TO COUNT';
+      position: absolute;
+      bottom: 20px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--text2);
+      opacity: 0.4;
+      font-weight: 600;
+    }
+    
+    .ring:hover::after {
+      opacity: 0.7;
+    }
+    
+    .ring:active {
+      transform: scale(0.96);
     }
 
     .ring.listening {
       border-color: var(--green);
       border-width: 3px;
       background: var(--green-light);
+      box-shadow: 0 0 15px rgba(29, 158, 117, 0.2);
     }
 
     .ring.pulse {
@@ -225,7 +246,7 @@
 
     @keyframes pulse {
       0%   { transform: scale(1); }
-      50%  { transform: scale(1.07); }
+      50%  { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
 
@@ -238,11 +259,14 @@
     }
 
     .count-label {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text2);
       margin-top: 4px;
       letter-spacing: 0.05em;
-      text-transform: lowercase;
+      text-transform: uppercase;
+      font-weight: 500;
+      opacity: 0.8;
+      transition: opacity 0.2s;
     }
 
     .arabic {
@@ -287,10 +311,68 @@
       50%       { opacity: 0.25; }
     }
 
-    .btn-row {
+    .controls-row {
       display: flex;
-      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
       width: 100%;
+      margin-bottom: 2rem;
+    }
+
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s, border-color 0.2s;
+      color: var(--text);
+    }
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+    
+    .icon-btn.small {
+      width: 48px;
+      height: 48px;
+    }
+    
+    .icon-btn.small svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text2);
+    }
+
+    .icon-btn.large {
+      width: 72px;
+      height: 72px;
+      border-width: 2px;
+      border-color: var(--green);
+      background: var(--surface);
+    }
+    .icon-btn.large svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--green);
+      transition: stroke 0.3s;
+    }
+
+    .icon-btn.large.listening {
+      background: var(--green);
+      border-color: var(--green);
+      animation: mic-pulse 1.5s infinite;
+    }
+    .icon-btn.large.listening svg {
+      stroke: #fff;
+    }
+
+    @keyframes mic-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(29, 158, 117, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(29, 158, 117, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(29, 158, 117, 0); }
     }
 
     .btn {
@@ -309,17 +391,6 @@
     .btn:hover { background: var(--surface2); }
     .btn:active { transform: scale(0.97); }
 
-    .btn.primary {
-      border-color: var(--green);
-      color: var(--green-dark);
-      font-weight: 500;
-    }
-
-    .btn.primary.on {
-      background: var(--green);
-      color: #fff;
-    }
-
     .btn.danger {
       border-color: rgba(163, 45, 45, 0.5);
       color: var(--red);
@@ -330,7 +401,7 @@
     }
 
     .data-actions {
-      margin-top: 0.8rem;
+      margin-top: 1rem;
       width: 100%;
       display: flex;
       gap: 10px;
@@ -480,19 +551,39 @@
 
       <div class="ring" id="ring" role="button" tabindex="0" aria-label="Tap to count once">
         <div class="count-num" id="countNum">0</div>
-        <div class="count-label">times</div>
+        <div class="count-label" id="countLabel">times</div>
       </div>
 
       <div class="arabic" id="arabicText">أَسْتَغْفِرُ اللَّهَ</div>
 
       <div class="status-row">
         <div class="dot" id="dot"></div>
-        <span id="statusText">Press "Start" to begin</span>
+        <span id="statusText">Press mic icon to begin voice counting</span>
       </div>
 
-      <div class="btn-row">
-        <button class="btn primary" id="startBtn" onclick="toggleListen()">Start listening</button>
-        <button class="btn" onclick="resetCount()">Reset</button>
+      <div class="controls-row">
+        <button class="icon-btn small" id="decrementBtn" onclick="decrementCount()" aria-label="Decrease count" title="Decrease count">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        
+        <button class="icon-btn large" id="startBtn" onclick="toggleListen()" aria-label="Toggle voice listening" title="Toggle voice listening">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </button>
+        
+        <button class="icon-btn small" id="resetBtn" onclick="resetCount()" aria-label="Reset count" title="Reset count">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
       </div>
 
       <div class="data-actions">
@@ -672,7 +763,7 @@
       lastMobileFinalText = '';
       lastMobileFinalAt = 0;
       syncCurrentDhikrStateToUi();
-      statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
+      statusText.textContent = isListening ? 'Listening…' : 'Press mic icon to begin voice counting';
       saveState();
     });
 
@@ -703,7 +794,7 @@
           statusText.textContent = 'Listening…';
         } else {
           dot.className = 'dot';
-          statusText.textContent = 'Press "Start" to begin';
+          statusText.textContent = 'Press mic icon to begin voice counting';
         }
       }, 300);
     }
@@ -787,7 +878,7 @@
 
       saveState();
       renderHistoryAccordion();
-      statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
+      statusText.textContent = isListening ? 'Listening…' : 'Press mic icon to begin voice counting';
     }
 
     function clearCurrentDhikrData() {
@@ -802,7 +893,7 @@
       countNum.textContent = 0;
       saveState();
       renderHistoryAccordion();
-      statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
+      statusText.textContent = isListening ? 'Listening…' : 'Press mic icon to begin voice counting';
     }
 
     function clearAllData() {
@@ -816,7 +907,7 @@
       countNum.textContent = 0;
       saveState();
       renderHistoryAccordion();
-      statusText.textContent = isListening ? 'Listening…' : 'Press "Start" to begin';
+      statusText.textContent = isListening ? 'Listening…' : 'Press mic icon to begin voice counting';
     }
 
     function toggleListen() {
@@ -851,7 +942,7 @@
         dot.className = 'dot active';
         statusText.textContent = 'Listening…';
         ring.classList.add('listening');
-        startBtn.textContent = 'Stop listening';
+        startBtn.classList.add('listening');
       };
 
       r.onresult = (e) => {
@@ -948,8 +1039,6 @@
 
       errorMsg.style.display = 'none';
       isListening = true;
-      startBtn.textContent = 'Starting up...';
-      startBtn.classList.add('on');
 
       if (recognition) {
         try { recognition.stop(); } catch(e) {}
@@ -964,10 +1053,15 @@
       clearTimeout(watchdogTimer);
       if (recognition) { recognition.onend = null; recognition.stop(); recognition = null; }
       dot.className = 'dot';
-      statusText.textContent = 'Stopped. Press "Start" to resume.';
+      statusText.textContent = 'Voice counting stopped.';
       ring.classList.remove('listening');
-      startBtn.textContent = 'Start listening';
-      startBtn.classList.remove('on');
+      startBtn.classList.remove('listening');
+    }
+
+    function decrementCount() {
+      if (count > 0) {
+        updateCount(count - 1);
+      }
     }
 
     arabicText.textContent = currentDhikr().arabic;
