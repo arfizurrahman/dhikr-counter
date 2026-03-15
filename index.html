@@ -75,10 +75,47 @@
     }
 
     .app-sub {
-      font-size: 13px;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+      text-align: left;
+      margin-bottom: 2rem;
+      width: 100%;
+      padding: 12px 30px 12px 20px;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      overflow: hidden;
+      display: block; /* So we can hide it via style.display = 'none' smoothly */
+    }
+    .app-sub::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--green);
+    }
+    .close-instruction {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 20px;
+      line-height: 1;
       color: var(--text2);
-      text-align: center;
-      margin-bottom: 1rem;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: opacity 0.2s, color 0.2s;
+      padding: 0;
+    }
+    .close-instruction:hover {
+      opacity: 1;
+      color: var(--text);
     }
 
     .selector-wrap {
@@ -371,7 +408,11 @@
 <body>
   <div class="card">
     <div class="app-title">Dhikr Counter</div>
-    <div class="app-sub">Choose a dhikr, say it, or tap the circle</div>
+    <div class="app-sub" id="instructionBox" tabindex="0">
+      <button class="close-instruction" id="closeInstructionBtn" aria-label="Dismiss instructions">×</button>
+      <span style="display:block; font-weight:700; color:var(--green); margin-bottom: 2px;">Start Here</span>
+      <span style="font-size: 13px; color:var(--text2);">Choose a dhikr, then say it or tap the circle</span>
+    </div>
 
     <div class="selector-wrap">
       <label class="selector-label" for="dhikrSelect">Dhikr</label>
@@ -441,6 +482,20 @@
     const historyAccordion = document.getElementById('historyAccordion');
     const dhikrSelect = document.getElementById('dhikrSelect');
     const arabicText = document.getElementById('arabicText');
+    const instructionBox = document.getElementById('instructionBox');
+    const closeInstructionBtn = document.getElementById('closeInstructionBtn');
+
+    if (localStorage.getItem('hideInstruction') === 'true') {
+      instructionBox.style.display = 'none';
+      instructionBox.style.marginBottom = '0';
+    }
+
+    closeInstructionBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      instructionBox.style.display = 'none';
+      instructionBox.style.marginBottom = '0';
+      localStorage.setItem('hideInstruction', 'true');
+    });
 
     const dhikrMap = {
       astaghfirullah: {
