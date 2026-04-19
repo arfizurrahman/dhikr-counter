@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A simple dhikr counter with manual and voice counting support." />
+  <meta name="theme-color" content="#1D9E75" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Dhikr Counter" />
   <title>Dhikr Counter</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon-192.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
@@ -599,7 +607,7 @@
         <div class="accordion" id="historyAccordion"></div>
       </div>
 
-      <div class="footer">Works best in Chrome or Edge &nbsp;·&nbsp; Microphone required</div>
+      <div class="footer">Installable as a PWA on modern browsers &nbsp;·&nbsp; Voice counting works best in Chrome/Edge</div>
     </div> <!-- /.card -->
 
     <!-- Desktop Sidebar History -->
@@ -1062,6 +1070,15 @@
       if (count > 0) {
         updateCount(count - 1);
       }
+    }
+
+    function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) return;
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch((err) => {
+          console.warn('Service worker registration failed:', err);
+        });
+      });
     }
 
     arabicText.textContent = currentDhikr().arabic;
