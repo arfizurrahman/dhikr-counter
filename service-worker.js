@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'dhikr-counter-v2';
+﻿const CACHE_NAME = 'dhikr-counter-v3';
 const APP_SHELL_FILES = [
   './',
   './index.html',
@@ -35,6 +35,22 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  // Keep app shell fresh: try network first for page navigations.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put('./index.html', responseToCache);
+          });
+          return networkResponse;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {

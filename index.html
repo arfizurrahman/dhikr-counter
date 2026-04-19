@@ -440,6 +440,326 @@
       border-bottom-color: var(--green);
     }
 
+    .active-challenge-card {
+      margin-top: 1.1rem;
+      width: 100%;
+      border: 1px solid var(--green);
+      background: var(--green-light);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    .active-challenge-title {
+      font-size: 11px;
+      color: var(--green-dark);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .active-challenge-main {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .active-challenge-sub {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .panel-actions {
+      margin-top: 0.9rem;
+      width: 100%;
+      display: flex;
+      gap: 10px;
+    }
+
+    .panel-btn {
+      flex: 1;
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      background: var(--surface2);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .challenge-side-panel {
+      display: none;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      padding: 1.2rem;
+      align-self: stretch;
+      max-height: 800px;
+      overflow-y: auto;
+    }
+
+    .challenge-side-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+      padding: 14px;
+    }
+
+    .drawer-backdrop.open {
+      display: flex;
+    }
+
+    .drawer-backdrop.modal {
+      align-items: center;
+    }
+
+    .drawer-sheet {
+      width: 100%;
+      max-width: 520px;
+      max-height: 86vh;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .drawer-backdrop.modal .drawer-sheet {
+      max-width: 460px;
+      max-height: 70vh;
+    }
+
+    .success-modal-body {
+      text-align: center;
+      padding: 10px 4px 2px;
+    }
+
+    .success-kicker {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--green-dark);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .success-title {
+      font-size: 22px;
+      line-height: 1.2;
+      color: var(--text);
+      font-family: 'Amiri', serif;
+      margin-bottom: 8px;
+    }
+
+    .success-sub {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 14px;
+    }
+
+    .fireworks-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1200;
+    }
+
+    .drawer-head {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .drawer-close {
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      color: var(--text2);
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .drawer-body {
+      padding: 12px;
+      overflow-y: auto;
+    }
+
+    .challenge-panel {
+      margin-top: 1.2rem;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface2);
+      padding: 12px;
+    }
+
+    .challenge-panel-title {
+      font-size: 11px;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .challenge-mode {
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 10px;
+    }
+
+    .challenge-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .challenge-field {
+      width: 100%;
+      border: 1px solid var(--border2);
+      background: var(--surface);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 9px 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+    }
+
+    .challenge-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .challenge-btn {
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      flex: 1;
+    }
+
+    .challenge-btn.primary {
+      border-color: var(--green);
+      color: var(--green-dark);
+      font-weight: 600;
+    }
+
+    .challenge-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .challenge-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      padding: 10px;
+    }
+
+    .challenge-item.active-selected {
+      border-color: var(--green);
+      box-shadow: 0 0 0 1px rgba(29, 158, 117, 0.2) inset;
+    }
+
+    .challenge-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+
+    .challenge-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .challenge-status {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      padding: 3px 7px;
+      color: var(--text2);
+      white-space: nowrap;
+    }
+
+    .challenge-status.active {
+      border-color: var(--green);
+      color: var(--green-dark);
+    }
+
+    .challenge-status.completed {
+      border-color: var(--green-dark);
+      color: var(--green-dark);
+    }
+
+    .challenge-status.failed {
+      border-color: rgba(163, 45, 45, 0.5);
+      color: var(--red);
+    }
+
+    .challenge-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 8px;
+    }
+
+    .challenge-meta span strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .challenge-item-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .challenge-item-actions .challenge-btn {
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+
     .error-msg {
       font-size: 12px;
       color: var(--red);
@@ -558,6 +878,21 @@
       text-align: center;
       opacity: 0.6;
     }
+
+    @media (min-width: 850px) {
+      .app-container {
+        max-width: 1040px;
+      }
+
+      .challenge-side-panel {
+        display: block;
+        flex: 1;
+      }
+
+      #openChallengesBtn {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -624,27 +959,91 @@
         <button class="btn danger" onclick="clearAllData()">Clear all data</button>
       </div>
 
-      <div class="install-wrap">
-        <a href="#" id="installLink" class="install-link">Install this app</a>
+      <div id="activeChallengeCard" class="active-challenge-card" style="display:none"></div>
+
+      <div class="panel-actions">
+        <button class="panel-btn" id="openChallengesBtn" type="button">Challenges</button>
+        <button class="panel-btn" id="openHistoryBtn" type="button">History</button>
       </div>
 
       <div id="errorMsg" class="error-msg" style="display:none"></div>
 
-      <!-- Mobile/Inline History -->
-      <div class="history" id="historyBlock" style="display:none">
-        <div class="history-title">All dhikr history</div>
-        <div class="accordion" id="historyAccordion"></div>
+      <div class="install-wrap">
+        <a href="#" id="installLink" class="install-link">Install this app</a>
       </div>
 
       <div class="footer">Voice counting works best in Chrome/Edge</div>
     </div> <!-- /.card -->
 
-    <!-- Desktop Sidebar History -->
-    <div class="history-card" id="desktopHistoryCard">
-      <div class="history-title" style="margin-bottom: 1rem; font-size:18px;">All dhikr history</div>
-      <div class="accordion" id="desktopHistoryAccordion"></div>
-    </div>
+    <aside class="challenge-side-panel" id="challengeSidePanel">
+      <div class="challenge-side-title">Challenges</div>
+      <button class="challenge-btn primary" id="openCreateChallengeDesktopBtn" type="button" style="margin-bottom:10px;">Create challenge</button>
+      <div class="challenge-list" id="challengeListDesktop"></div>
+    </aside>
   </div> <!-- /.app-container -->
+
+  <div class="drawer-backdrop" id="challengesDrawer" aria-hidden="true">
+    <div class="drawer-sheet" role="dialog" aria-modal="true" aria-label="Challenges drawer">
+      <div class="drawer-head">
+        <div class="drawer-title">Challenges</div>
+        <button class="drawer-close" id="closeChallengesDrawerBtn" type="button" aria-label="Close challenges">x</button>
+      </div>
+      <div class="drawer-body">
+        <button class="challenge-btn primary" id="openCreateChallengeBtn" type="button" style="margin-bottom:10px;">Create challenge</button>
+        <div class="challenge-list" id="challengeList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-backdrop" id="historyDrawer" aria-hidden="true">
+    <div class="drawer-sheet" role="dialog" aria-modal="true" aria-label="History drawer">
+      <div class="drawer-head">
+        <div class="drawer-title">All Dhikr History</div>
+        <button class="drawer-close" id="closeHistoryDrawerBtn" type="button" aria-label="Close history">x</button>
+      </div>
+      <div class="drawer-body">
+        <div class="accordion" id="historyAccordionDrawer"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-backdrop modal" id="createChallengeModal" aria-hidden="true">
+    <div class="drawer-sheet" role="dialog" aria-modal="true" aria-label="Create challenge">
+      <div class="drawer-head">
+        <div class="drawer-title">Create Challenge</div>
+        <button class="drawer-close" id="closeCreateChallengeModalBtn" type="button" aria-label="Close create challenge">x</button>
+      </div>
+      <div class="drawer-body">
+        <div class="challenge-form">
+          <input id="challengeTitle" class="challenge-field" type="text" maxlength="80" placeholder="Challenge title (optional)" />
+          <select id="challengeDhikr" class="challenge-field"></select>
+          <input id="challengeTarget" class="challenge-field" type="number" min="1" step="1" placeholder="Target count (e.g. 1000)" />
+          <input id="challengeEndAt" class="challenge-field" type="datetime-local" />
+          <div class="challenge-actions">
+            <button class="challenge-btn primary" id="modalStartNowBtn" type="button">Start now</button>
+            <button class="challenge-btn" id="modalSaveLaterBtn" type="button">Save for later</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer-backdrop modal" id="challengeSuccessModal" aria-hidden="true">
+    <div class="drawer-sheet" role="dialog" aria-modal="true" aria-label="Challenge completed">
+      <div class="drawer-head">
+        <div class="drawer-title">Challenge Completed</div>
+        <button class="drawer-close" id="closeChallengeSuccessModalBtn" type="button" aria-label="Close success modal">x</button>
+      </div>
+      <div class="drawer-body success-modal-body">
+        <div class="success-kicker">MashaAllah</div>
+        <div class="success-title" id="successTitleText">Challenge completed!</div>
+        <div class="success-sub" id="successSubText">You reached your target.</div>
+        <button class="challenge-btn primary" id="successOkBtn" type="button">Awesome</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="fireworksCanvas" class="fireworks-layer" aria-hidden="true"></canvas>
 
   <script>
     let count = 0;
@@ -658,6 +1057,8 @@
     let lastMobileFinalText = '';
     let lastMobileFinalAt = 0;
     let watchdogTimer = null;
+    let challenges = [];
+    let selectedChallengeId = null;
     const STORAGE_KEY = 'dhikr-counter-state-v1';
 
     const countNum = document.getElementById('countNum');
@@ -666,16 +1067,42 @@
     const statusText = document.getElementById('statusText');
     const startBtn = document.getElementById('startBtn');
     const errorMsg = document.getElementById('errorMsg');
-    const historyBlock = document.getElementById('historyBlock');
-    const historyAccordion = document.getElementById('historyAccordion');
-    const desktopHistoryCard = document.getElementById('desktopHistoryCard');
-    const desktopHistoryAccordion = document.getElementById('desktopHistoryAccordion');
     const dhikrSelect = document.getElementById('dhikrSelect');
     const arabicText = document.getElementById('arabicText');
     const instructionBox = document.getElementById('instructionBox');
     const closeInstructionBtn = document.getElementById('closeInstructionBtn');
     const installLink = document.getElementById('installLink');
+    const activeChallengeCard = document.getElementById('activeChallengeCard');
+    const openChallengesBtn = document.getElementById('openChallengesBtn');
+    const openHistoryBtn = document.getElementById('openHistoryBtn');
+    const challengesDrawer = document.getElementById('challengesDrawer');
+    const historyDrawer = document.getElementById('historyDrawer');
+    const createChallengeModal = document.getElementById('createChallengeModal');
+    const challengeSuccessModal = document.getElementById('challengeSuccessModal');
+    const closeChallengesDrawerBtn = document.getElementById('closeChallengesDrawerBtn');
+    const closeHistoryDrawerBtn = document.getElementById('closeHistoryDrawerBtn');
+    const closeCreateChallengeModalBtn = document.getElementById('closeCreateChallengeModalBtn');
+    const closeChallengeSuccessModalBtn = document.getElementById('closeChallengeSuccessModalBtn');
+    const openCreateChallengeBtn = document.getElementById('openCreateChallengeBtn');
+    const openCreateChallengeDesktopBtn = document.getElementById('openCreateChallengeDesktopBtn');
+    const modalStartNowBtn = document.getElementById('modalStartNowBtn');
+    const modalSaveLaterBtn = document.getElementById('modalSaveLaterBtn');
+    const successTitleText = document.getElementById('successTitleText');
+    const successSubText = document.getElementById('successSubText');
+    const successOkBtn = document.getElementById('successOkBtn');
+    const challengeTitle = document.getElementById('challengeTitle');
+    const challengeDhikr = document.getElementById('challengeDhikr');
+    const challengeTarget = document.getElementById('challengeTarget');
+    const challengeEndAt = document.getElementById('challengeEndAt');
+    const challengeList = document.getElementById('challengeList');
+    const challengeListDesktop = document.getElementById('challengeListDesktop');
+    const historyAccordionDrawer = document.getElementById('historyAccordionDrawer');
+    const fireworksCanvas = document.getElementById('fireworksCanvas');
+    const fireworksCtx = fireworksCanvas.getContext('2d');
     let deferredInstallPrompt = null;
+    let fireworksParticles = [];
+    let fireworksAnimationId = null;
+    let fireworksUntil = 0;
 
     if (localStorage.getItem('hideInstruction') === 'true') {
       instructionBox.style.display = 'none';
@@ -736,7 +1163,9 @@
         const state = {
           selectedDhikr: currentDhikrKey(),
           countByDhikr,
-          sessionsByDhikr
+          sessionsByDhikr,
+          challenges,
+          selectedChallengeId
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) {
@@ -756,6 +1185,12 @@
           if (parsed.sessionsByDhikr && typeof parsed.sessionsByDhikr === 'object') {
             sessionsByDhikr = parsed.sessionsByDhikr;
           }
+          if (Array.isArray(parsed.challenges)) {
+            challenges = parsed.challenges;
+          }
+          if (typeof parsed.selectedChallengeId === 'string') {
+            selectedChallengeId = parsed.selectedChallengeId;
+          }
           if (typeof parsed.selectedDhikr === 'string' && dhikrMap[parsed.selectedDhikr]) {
             dhikrSelect.value = parsed.selectedDhikr;
           }
@@ -766,7 +1201,7 @@
     }
 
     function dhikrLabelByKey(key) {
-      const option = [...dhikrSelect.options].find(o => o.value === key);
+      const option = [...dhikrSelect.options].find((o) => o.value === key);
       return option ? option.text : key;
     }
 
@@ -777,21 +1212,476 @@
       return live + archived;
     }
 
+    function initChallengeDhikrOptions() {
+      challengeDhikr.innerHTML = [...dhikrSelect.options]
+        .map((o) => `<option value="${o.value}">${o.text}</option>`)
+        .join('');
+      challengeDhikr.value = currentDhikrKey();
+    }
+
+    function fmtDateTime(value) {
+      if (!value) return 'Not started';
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return 'Invalid date';
+      return d.toLocaleString([], {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function ensureChallengeShape(raw) {
+      if (!raw || typeof raw !== 'object') return null;
+      const targetCount = Number(raw.targetCount);
+      const currentCount = Number(raw.currentCount || 0);
+      const normalized = {
+        id: typeof raw.id === 'string' ? raw.id : `ch_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        title: typeof raw.title === 'string' ? raw.title : '',
+        dhikrKey: dhikrMap[raw.dhikrKey] ? raw.dhikrKey : 'astaghfirullah',
+        targetCount: Number.isFinite(targetCount) && targetCount > 0 ? targetCount : 1,
+        currentCount: Number.isFinite(currentCount) && currentCount > 0 ? currentCount : 0,
+        startAt: raw.startAt ? String(raw.startAt) : null,
+        endAt: typeof raw.endAt === 'string' ? raw.endAt : '',
+        status: typeof raw.status === 'string' ? raw.status : 'saved',
+        createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString(),
+        updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString()
+      };
+      if (!normalized.endAt) return null;
+      return normalized;
+    }
+
+    function normalizeChallenges() {
+      challenges = challenges
+        .map(ensureChallengeShape)
+        .filter(Boolean)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      if (!challenges.some((c) => c.id === selectedChallengeId)) {
+        selectedChallengeId = null;
+      }
+    }
+
+    function refreshChallengeStatuses() {
+      const now = Date.now();
+      let changed = false;
+      challenges.forEach((c) => {
+        if (c.status === 'completed' || c.status === 'failed') return;
+        const endMs = new Date(c.endAt).getTime();
+        if (Number.isFinite(endMs) && now > endMs) {
+          c.status = 'failed';
+          c.updatedAt = new Date().toISOString();
+          changed = true;
+          return;
+        }
+        if (c.startAt && c.currentCount >= c.targetCount) {
+          c.status = 'completed';
+          c.updatedAt = new Date().toISOString();
+          changed = true;
+          return;
+        }
+        c.status = c.startAt ? 'active' : 'saved';
+      });
+
+      const selected = challenges.find((c) => c.id === selectedChallengeId);
+      if (!selected || selected.status !== 'active') {
+        selectedChallengeId = null;
+      }
+
+      if (changed) saveState();
+    }
+
+    function getActiveSelectedChallenge() {
+      const c = challenges.find((x) => x.id === selectedChallengeId);
+      if (!c || c.status !== 'active') return null;
+      return c;
+    }
+
+    function hasAnotherActiveForDhikr(dhikrKey, excludeId) {
+      return challenges.some((c) => c.status === 'active' && c.dhikrKey === dhikrKey && c.id !== excludeId);
+    }
+
+    function renderActiveChallengeSummary() {
+      const active = getActiveSelectedChallenge();
+      if (!active) {
+        activeChallengeCard.style.display = 'none';
+        return;
+      }
+
+      activeChallengeCard.style.display = 'block';
+      activeChallengeCard.innerHTML = `
+        <div class="active-challenge-title">Active challenge</div>
+        <div class="active-challenge-main">${active.title || dhikrLabelByKey(active.dhikrKey)}</div>
+        <div class="active-challenge-sub">Dhikr: ${dhikrLabelByKey(active.dhikrKey)} • ${active.currentCount}/${active.targetCount} • Ends ${fmtDateTime(active.endAt)}</div>
+      `;
+    }
+
+    function renderChallengeList() {
+      refreshChallengeStatuses();
+      if (challenges.length === 0) {
+        const emptyHtml = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0;">No challenges yet.</div>';
+        challengeList.innerHTML = emptyHtml;
+        challengeListDesktop.innerHTML = emptyHtml;
+        renderActiveChallengeSummary();
+        return;
+      }
+
+      const html = challenges
+        .slice()
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .map((c) => {
+          const selectedClass = c.id === selectedChallengeId ? ' active-selected' : '';
+          const canStart = c.status === 'saved';
+          const canSelect = c.status === 'active';
+          return `<div class="challenge-item${selectedClass}">
+            <div class="challenge-head">
+              <div class="challenge-name">${c.title || dhikrLabelByKey(c.dhikrKey)}</div>
+              <div class="challenge-status ${c.status}">${c.status}</div>
+            </div>
+            <div class="challenge-meta">
+              <span>Dhikr: <strong>${dhikrLabelByKey(c.dhikrKey)}</strong></span>
+              <span>Count: <strong>${c.currentCount}/${c.targetCount}</strong></span>
+              <span>Created: <strong>${fmtDateTime(c.createdAt)}</strong></span>
+              <span>Start: <strong>${fmtDateTime(c.startAt)}</strong></span>
+              <span style="grid-column: span 2;">Ends: <strong>${fmtDateTime(c.endAt)}</strong></span>
+            </div>
+            <div class="challenge-item-actions">
+              ${canStart ? '<button class="challenge-btn primary" type="button" data-action="start" data-id="' + c.id + '">Start</button>' : ''}
+              ${canSelect ? '<button class="challenge-btn" type="button" data-action="select" data-id="' + c.id + '">' + (c.id === selectedChallengeId ? 'Selected' : 'Select') + '</button>' : ''}
+              <button class="challenge-btn" type="button" data-action="delete" data-id="${c.id}">Delete</button>
+            </div>
+          </div>`;
+        })
+        .join('');
+
+      challengeList.innerHTML = html;
+      challengeListDesktop.innerHTML = html;
+      renderActiveChallengeSummary();
+    }
+
+    function resizeFireworksCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      fireworksCanvas.width = Math.floor(width * dpr);
+      fireworksCanvas.height = Math.floor(height * dpr);
+      fireworksCanvas.style.width = width + 'px';
+      fireworksCanvas.style.height = height + 'px';
+      fireworksCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function spawnFirework(x, y) {
+      const colors = ['#1D9E75', '#2bb48a', '#f6c945', '#f28b50', '#ff5e7e', '#7dd3fc'];
+      const pieces = 34;
+      for (let i = 0; i < pieces; i++) {
+        const angle = (Math.PI * 2 * i) / pieces + (Math.random() * 0.12);
+        const speed = 1.8 + Math.random() * 3.2;
+        fireworksParticles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 42 + Math.random() * 24,
+          ttl: 42 + Math.random() * 24,
+          size: 1.8 + Math.random() * 2.4,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+    }
+
+    function animateFireworks() {
+      fireworksCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+      fireworksParticles = fireworksParticles.filter((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.04;
+        p.vx *= 0.99;
+        p.life -= 1;
+        if (p.life <= 0) return false;
+
+        const alpha = Math.max(0, p.life / p.ttl);
+        fireworksCtx.globalAlpha = alpha;
+        fireworksCtx.fillStyle = p.color;
+        fireworksCtx.beginPath();
+        fireworksCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        fireworksCtx.fill();
+        return true;
+      });
+
+      fireworksCtx.globalAlpha = 1;
+      if (Date.now() < fireworksUntil || fireworksParticles.length > 0) {
+        fireworksAnimationId = requestAnimationFrame(animateFireworks);
+        return;
+      }
+
+      fireworksAnimationId = null;
+    }
+
+    function triggerCelebration() {
+      resizeFireworksCanvas();
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      const bursts = 5;
+      for (let i = 0; i < bursts; i++) {
+        const x = width * (0.15 + Math.random() * 0.7);
+        const y = height * (0.18 + Math.random() * 0.4);
+        setTimeout(() => spawnFirework(x, y), i * 110);
+      }
+      fireworksUntil = Date.now() + 1200;
+      if (!fireworksAnimationId) {
+        fireworksAnimationId = requestAnimationFrame(animateFireworks);
+      }
+    }
+
+    function showChallengeSuccessModal(challenge) {
+      const title = challenge.title || dhikrLabelByKey(challenge.dhikrKey);
+      successTitleText.textContent = `You completed "${title}"`;
+      successSubText.textContent = `Great job! You reached ${challenge.currentCount}/${challenge.targetCount} for ${dhikrLabelByKey(challenge.dhikrKey)}.`;
+      openOverlay(challengeSuccessModal);
+    }
+
+    function createChallenge(startNow) {
+      const dhikrKey = challengeDhikr.value;
+      const title = challengeTitle.value.trim();
+      const targetCount = Number(challengeTarget.value);
+      const endRaw = challengeEndAt.value;
+
+      if (!dhikrMap[dhikrKey]) {
+        window.alert('Please choose a dhikr for the challenge.');
+        return false;
+      }
+      if (!Number.isFinite(targetCount) || targetCount < 1) {
+        window.alert('Please enter a valid target count.');
+        return false;
+      }
+      if (!endRaw) {
+        window.alert('Please choose a challenge end date and time.');
+        return false;
+      }
+
+      const endAtMs = new Date(endRaw).getTime();
+      if (!Number.isFinite(endAtMs)) {
+        window.alert('Please provide a valid end date and time.');
+        return false;
+      }
+      if (endAtMs <= Date.now()) {
+        window.alert('End date/time must be in the future.');
+        return false;
+      }
+      if (startNow && hasAnotherActiveForDhikr(dhikrKey)) {
+        window.alert('An active challenge already exists for this dhikr. Complete or switch that challenge first.');
+        return false;
+      }
+
+      const nowIso = new Date().toISOString();
+      const challenge = {
+        id: `ch_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        title,
+        dhikrKey,
+        targetCount,
+        currentCount: 0,
+        startAt: startNow ? nowIso : null,
+        endAt: new Date(endRaw).toISOString(),
+        status: startNow ? 'active' : 'saved',
+        createdAt: nowIso,
+        updatedAt: nowIso
+      };
+
+      challenges.unshift(challenge);
+      if (startNow) {
+        selectedChallengeId = challenge.id;
+        if (dhikrSelect.value !== challenge.dhikrKey) {
+          dhikrSelect.value = challenge.dhikrKey;
+          dhikrSelect.dispatchEvent(new Event('change'));
+        }
+      }
+
+      challengeTitle.value = '';
+      challengeTarget.value = '';
+      challengeEndAt.value = '';
+      challengeDhikr.value = currentDhikrKey();
+
+      saveState();
+      renderChallengeList();
+      return true;
+    }
+
+    function openOverlay(el) {
+      el.classList.add('open');
+      el.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeOverlay(el) {
+      el.classList.remove('open');
+      el.setAttribute('aria-hidden', 'true');
+      const anyOpen = [challengesDrawer, historyDrawer, createChallengeModal, challengeSuccessModal].some((x) => x.classList.contains('open'));
+      if (!anyOpen) {
+        document.body.style.overflow = '';
+      }
+    }
+
+    function startSavedChallenge(id) {
+      const challenge = challenges.find((c) => c.id === id);
+      if (!challenge || challenge.status !== 'saved') return;
+
+      if (hasAnotherActiveForDhikr(challenge.dhikrKey, challenge.id)) {
+        window.alert('Another active challenge already exists for this dhikr.');
+        return;
+      }
+
+      if (new Date(challenge.endAt).getTime() <= Date.now()) {
+        challenge.status = 'failed';
+        challenge.updatedAt = new Date().toISOString();
+        saveState();
+        renderChallengeList();
+        return;
+      }
+
+      challenge.startAt = new Date().toISOString();
+      challenge.status = 'active';
+      challenge.updatedAt = new Date().toISOString();
+      selectedChallengeId = challenge.id;
+
+      if (dhikrSelect.value !== challenge.dhikrKey) {
+        dhikrSelect.value = challenge.dhikrKey;
+        dhikrSelect.dispatchEvent(new Event('change'));
+      }
+
+      saveState();
+      renderChallengeList();
+    }
+
+    function selectChallenge(id) {
+      const challenge = challenges.find((c) => c.id === id);
+      if (!challenge || challenge.status !== 'active') return;
+      selectedChallengeId = challenge.id;
+
+      if (dhikrSelect.value !== challenge.dhikrKey) {
+        dhikrSelect.value = challenge.dhikrKey;
+        dhikrSelect.dispatchEvent(new Event('change'));
+      }
+
+      saveState();
+      renderChallengeList();
+    }
+
+    function deleteChallenge(id) {
+      const challenge = challenges.find((c) => c.id === id);
+      if (!challenge) return;
+      const label = challenge.title || dhikrLabelByKey(challenge.dhikrKey);
+      const ok = window.confirm('Delete challenge "' + label + '"?');
+      if (!ok) return;
+
+      challenges = challenges.filter((c) => c.id !== id);
+      if (selectedChallengeId === id) selectedChallengeId = null;
+      saveState();
+      renderChallengeList();
+    }
+
+    function applyDeltaToActiveChallenge(delta) {
+      if (!delta) return;
+      refreshChallengeStatuses();
+      const challenge = getActiveSelectedChallenge();
+      if (!challenge) return;
+      if (challenge.dhikrKey !== currentDhikrKey()) return;
+
+      const wasCompleted = challenge.currentCount >= challenge.targetCount || challenge.status === 'completed';
+      challenge.currentCount = Math.max(0, challenge.currentCount + delta);
+      challenge.updatedAt = new Date().toISOString();
+      if (challenge.currentCount >= challenge.targetCount) {
+        challenge.status = 'completed';
+        if (!wasCompleted) {
+          triggerCelebration();
+          showChallengeSuccessModal(challenge);
+        }
+      }
+      saveState();
+      renderChallengeList();
+    }
+
+    function applyCountingDelta(delta) {
+      if (!Number.isFinite(delta) || delta === 0) return;
+      updateCount(Math.max(0, count + delta));
+      applyDeltaToActiveChallenge(delta);
+    }
+
     function syncCurrentDhikrStateToUi() {
       const key = currentDhikrKey();
       count = countByDhikr[key] || 0;
       countNum.textContent = count;
       renderHistoryAccordion();
+      renderActiveChallengeSummary();
     }
 
     loadState();
     ensureDhikrState();
+    normalizeChallenges();
 
     ring.addEventListener('click', manualCount);
     ring.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         manualCount();
+      }
+    });
+
+    function handleChallengeListClick(e, container) {
+      const btn = e.target.closest('button[data-action][data-id]');
+      if (!btn || !container.contains(btn)) return;
+      const action = btn.getAttribute('data-action');
+      const id = btn.getAttribute('data-id');
+      if (!id) return;
+
+      if (action === 'start') {
+        startSavedChallenge(id);
+        return;
+      }
+      if (action === 'select') {
+        selectChallenge(id);
+        return;
+      }
+      if (action === 'delete') {
+        deleteChallenge(id);
+      }
+    }
+
+    challengeList.addEventListener('click', (e) => handleChallengeListClick(e, challengeList));
+    challengeListDesktop.addEventListener('click', (e) => handleChallengeListClick(e, challengeListDesktop));
+
+    openChallengesBtn.addEventListener('click', () => openOverlay(challengesDrawer));
+    openHistoryBtn.addEventListener('click', () => openOverlay(historyDrawer));
+    openCreateChallengeBtn.addEventListener('click', () => openOverlay(createChallengeModal));
+    openCreateChallengeDesktopBtn.addEventListener('click', () => openOverlay(createChallengeModal));
+    closeChallengesDrawerBtn.addEventListener('click', () => closeOverlay(challengesDrawer));
+    closeHistoryDrawerBtn.addEventListener('click', () => closeOverlay(historyDrawer));
+    closeCreateChallengeModalBtn.addEventListener('click', () => closeOverlay(createChallengeModal));
+    closeChallengeSuccessModalBtn.addEventListener('click', () => closeOverlay(challengeSuccessModal));
+    successOkBtn.addEventListener('click', () => closeOverlay(challengeSuccessModal));
+
+    [challengesDrawer, historyDrawer, createChallengeModal, challengeSuccessModal].forEach((overlay) => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          closeOverlay(overlay);
+        }
+      });
+    });
+
+    window.addEventListener('resize', resizeFireworksCanvas);
+
+    modalStartNowBtn.addEventListener('click', () => {
+      const ok = createChallenge(true);
+      if (ok) {
+        closeOverlay(createChallengeModal);
+      }
+    });
+
+    modalSaveLaterBtn.addEventListener('click', () => {
+      const ok = createChallenge(false);
+      if (ok) {
+        closeOverlay(createChallengeModal);
       }
     });
 
@@ -803,6 +1693,7 @@
       lastMobileFinalAt = 0;
       syncCurrentDhikrStateToUi();
       statusText.textContent = isListening ? 'Listening…' : 'Press mic icon to begin voice counting';
+      challengeDhikr.value = currentDhikrKey();
       saveState();
     });
 
@@ -824,7 +1715,7 @@
     }
 
     function manualCount() {
-      updateCount(count + 1);
+      applyCountingDelta(1);
       dot.className = 'dot detected';
       statusText.textContent = '+1 counted (manual)';
       setTimeout(() => {
@@ -855,22 +1746,17 @@
     }
 
     function renderHistoryAccordion() {
-      const performedKeys = Object.keys(dhikrMap).filter(key => {
+      const performedKeys = Object.keys(dhikrMap).filter((key) => {
         const live = countByDhikr[key] || 0;
         const sessions = sessionsByDhikr[key] || [];
         return live > 0 || sessions.length > 0;
       });
 
       if (performedKeys.length === 0) {
-        historyBlock.style.display = 'none';
-        desktopHistoryCard.style.display = 'flex';
-        historyAccordion.innerHTML = '';
-        desktopHistoryAccordion.innerHTML = '<div style="color:var(--text2); text-align:center; margin-top:2rem;">No history yet. Start counting!</div>';
+        historyAccordionDrawer.innerHTML = '<div style="color:var(--text2); text-align:center; margin-top:1.2rem;">No history yet. Start counting!</div>';
         return;
       }
 
-      historyBlock.style.display = 'block';
-      desktopHistoryCard.style.display = 'flex';
       const htmlContent = performedKeys.map((key) => {
         const live = countByDhikr[key] || 0;
         const sessions = sessionsByDhikr[key] || [];
@@ -878,7 +1764,7 @@
         const liveItem = live > 0
           ? `<div class="session-item"><span>Current</span><span class="session-count">${live}×</span></div>`
           : '';
-        const sessionItems = sessions.map(s =>
+        const sessionItems = sessions.map((s) =>
           `<div class="session-item"><span>${s.time}</span><span class="session-count">${s.count}×</span></div>`
         ).join('');
         const openAttr = key === currentDhikrKey() ? ' open' : '';
@@ -895,9 +1781,8 @@
           </div>
         </details>`;
       }).join('');
-      
-      historyAccordion.innerHTML = htmlContent;
-      desktopHistoryAccordion.innerHTML = htmlContent;
+
+      historyAccordionDrawer.innerHTML = htmlContent;
     }
 
     function removeDhikrDataFromAccordion(event, key) {
@@ -941,11 +1826,14 @@
 
       countByDhikr = {};
       sessionsByDhikr = {};
+      challenges = [];
+      selectedChallengeId = null;
       ensureDhikrState();
       count = 0;
       countNum.textContent = 0;
       saveState();
       renderHistoryAccordion();
+      renderChallengeList();
       statusText.textContent = isListening ? 'Listening…' : 'Press mic icon to begin voice counting';
     }
 
@@ -957,17 +1845,15 @@
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       const r = new SR();
       r.lang = 'ar-SA';
-      // Restoring to continuous = true, which PC Chrome heavily preferred for fluidity
-      r.continuous = true; 
+      r.continuous = true;
       r.interimResults = !isMobileDevice;
       r.maxAlternatives = 1;
 
-      // Watchdog aggressively forces a clear/restart to prevent freezing.
       function resetWatchdog() {
         clearTimeout(watchdogTimer);
         watchdogTimer = setTimeout(() => {
           if (isListening && r) {
-            try { r.stop(); } catch(e) {}
+            try { r.stop(); } catch (e) {}
           }
         }, 5000);
       }
@@ -1003,15 +1889,17 @@
             const isDuplicateEcho = normalized === lastMobileFinalText && (now - lastMobileFinalAt) < 450;
             if (isDuplicateEcho) continue;
 
-            // Count all detected occurrences in this finalized phrase.
-            updateCount(count + occurrences);
+            applyCountingDelta(occurrences);
             lastMobileFinalText = normalized;
             lastMobileFinalAt = now;
 
             dot.className = 'dot detected';
             statusText.textContent = '+' + occurrences + ' counted';
             setTimeout(() => {
-              if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
+              if (isListening) {
+                dot.className = 'dot active';
+                statusText.textContent = 'Listening…';
+              }
             }, 350);
           }
           return;
@@ -1023,20 +1911,20 @@
           const occurrences = countDhikrInTranscript(transcript);
           const previousMax = resultSlotMaxCounts[i] || 0;
 
-          // Count only positive deltas per recognition slot.
-          // This captures fast repeats in interim updates without double-counting old text.
           if (occurrences > previousMax) {
             const delta = occurrences - previousMax;
-            updateCount(count + delta);
+            applyCountingDelta(delta);
             resultSlotMaxCounts[i] = occurrences;
             dot.className = 'dot detected';
             statusText.textContent = '+' + delta + ' counted';
             setTimeout(() => {
-              if (isListening) { dot.className = 'dot active'; statusText.textContent = 'Listening…'; }
+              if (isListening) {
+                dot.className = 'dot active';
+                statusText.textContent = 'Listening…';
+              }
             }, 350);
           }
 
-          // Keep slot maxima even after finalization so repeated callbacks cannot recount it.
           if (result.isFinal && !(i in resultSlotMaxCounts)) {
             resultSlotMaxCounts[i] = occurrences;
           }
@@ -1055,10 +1943,9 @@
       };
 
       r.onend = () => {
-        // Restart seamlessly whenever the browser closes the recognition stream.
         if (isListening) {
-          try { r.start(); } catch(err) {
-            setTimeout(() => { if(isListening) try { r.start(); } catch(e){} }, 200);
+          try { r.start(); } catch (err) {
+            setTimeout(() => { if (isListening) try { r.start(); } catch (e) {} }, 200);
           }
         }
       };
@@ -1080,7 +1967,7 @@
       isListening = true;
 
       if (recognition) {
-        try { recognition.stop(); } catch(e) {}
+        try { recognition.stop(); } catch (e) {}
       }
 
       recognition = createRecognition();
@@ -1099,7 +1986,7 @@
 
     function decrementCount() {
       if (count > 0) {
-        updateCount(count - 1);
+        applyCountingDelta(-1);
       }
     }
 
@@ -1142,6 +2029,9 @@
 
     arabicText.textContent = currentDhikr().arabic;
     syncCurrentDhikrStateToUi();
+    initChallengeDhikrOptions();
+    renderChallengeList();
+    resizeFireworksCanvas();
     registerServiceWorker();
     setupInstallPrompt();
   </script>
