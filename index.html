@@ -508,6 +508,20 @@
       margin-bottom: 10px;
     }
 
+    .challenge-filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      font-size: 12px;
+      color: var(--text2);
+      user-select: none;
+    }
+
+    .challenge-filter-row input {
+      accent-color: var(--green);
+    }
+
     .drawer-backdrop {
       position: fixed;
       inset: 0;
@@ -978,6 +992,7 @@
     <aside class="challenge-side-panel" id="challengeSidePanel">
       <div class="challenge-side-title">Challenges</div>
       <button class="challenge-btn primary" id="openCreateChallengeDesktopBtn" type="button" style="margin-bottom:10px;">Create challenge</button>
+      <label class="challenge-filter-row"><input type="checkbox" class="show-completed-toggle" /> Show completed</label>
       <div class="challenge-list" id="challengeListDesktop"></div>
     </aside>
   </div> <!-- /.app-container -->
@@ -990,6 +1005,7 @@
       </div>
       <div class="drawer-body">
         <button class="challenge-btn primary" id="openCreateChallengeBtn" type="button" style="margin-bottom:10px;">Create challenge</button>
+        <label class="challenge-filter-row"><input type="checkbox" class="show-completed-toggle" /> Show completed</label>
         <div class="challenge-list" id="challengeList"></div>
       </div>
     </div>
@@ -1059,6 +1075,7 @@
     let watchdogTimer = null;
     let challenges = [];
     let selectedChallengeId = null;
+    let showCompletedChallenges = false;
     const STORAGE_KEY = 'dhikr-counter-state-v1';
 
     const countNum = document.getElementById('countNum');
@@ -1096,6 +1113,7 @@
     const challengeEndAt = document.getElementById('challengeEndAt');
     const challengeList = document.getElementById('challengeList');
     const challengeListDesktop = document.getElementById('challengeListDesktop');
+    const showCompletedToggles = document.querySelectorAll('.show-completed-toggle');
     const historyAccordionDrawer = document.getElementById('historyAccordionDrawer');
     const fireworksCanvas = document.getElementById('fireworksCanvas');
     const fireworksCtx = fireworksCanvas.getContext('2d');
@@ -1165,7 +1183,8 @@
           countByDhikr,
           sessionsByDhikr,
           challenges,
-          selectedChallengeId
+          selectedChallengeId,
+          showCompletedChallenges
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (e) {
@@ -1190,6 +1209,9 @@
           }
           if (typeof parsed.selectedChallengeId === 'string') {
             selectedChallengeId = parsed.selectedChallengeId;
+          }
+          if (typeof parsed.showCompletedChallenges === 'boolean') {
+            showCompletedChallenges = parsed.showCompletedChallenges;
           }
           if (typeof parsed.selectedDhikr === 'string' && dhikrMap[parsed.selectedDhikr]) {
             dhikrSelect.value = parsed.selectedDhikr;
@@ -1317,17 +1339,29 @@
       `;
     }
 
+    function syncShowCompletedToggles() {
+      showCompletedToggles.forEach((toggle) => {
+        toggle.checked = showCompletedChallenges;
+      });
+    }
+
     function renderChallengeList() {
       refreshChallengeStatuses();
-      if (challenges.length === 0) {
-        const emptyHtml = '<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0;">No challenges yet.</div>';
+      const visibleChallenges = showCompletedChallenges
+        ? challenges
+        : challenges.filter((c) => c.status !== 'completed');
+
+      if (visibleChallenges.length === 0) {
+        const emptyHtml = showCompletedChallenges
+          ? '<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0;">No challenges yet.</div>'
+          : '<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0;">No uncompleted challenges.</div>';
         challengeList.innerHTML = emptyHtml;
         challengeListDesktop.innerHTML = emptyHtml;
         renderActiveChallengeSummary();
         return;
       }
 
-      const html = challenges
+      const html = visibleChallenges
         .slice()
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .map((c) => {
@@ -1650,6 +1684,15 @@
 
     challengeList.addEventListener('click', (e) => handleChallengeListClick(e, challengeList));
     challengeListDesktop.addEventListener('click', (e) => handleChallengeListClick(e, challengeListDesktop));
+
+    showCompletedToggles.forEach((toggle) => {
+      toggle.addEventListener('change', (e) => {
+        showCompletedChallenges = e.target.checked;
+        syncShowCompletedToggles();
+        saveState();
+        renderChallengeList();
+      });
+    });
 
     openChallengesBtn.addEventListener('click', () => openOverlay(challengesDrawer));
     openHistoryBtn.addEventListener('click', () => openOverlay(historyDrawer));
@@ -2030,6 +2073,7 @@
     arabicText.textContent = currentDhikr().arabic;
     syncCurrentDhikrStateToUi();
     initChallengeDhikrOptions();
+    syncShowCompletedToggles();
     renderChallengeList();
     resizeFireworksCanvas();
     registerServiceWorker();
