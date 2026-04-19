@@ -10,8 +10,12 @@
   <meta name="apple-mobile-web-app-title" content="Dhikr Counter" />
   <title>Dhikr Counter</title>
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="icons/icon-192.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="icons/icon-192.svg" />
+  <link rel="icon" href="icons/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
@@ -415,6 +419,27 @@
       gap: 10px;
     }
 
+    .install-wrap {
+      margin-top: 0.8rem;
+      width: 100%;
+      text-align: center;
+    }
+
+    .install-link {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--green-dark);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--green-dark);
+      cursor: pointer;
+      padding-bottom: 2px;
+    }
+
+    .install-link:hover {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+
     .error-msg {
       font-size: 12px;
       color: var(--red);
@@ -599,6 +624,10 @@
         <button class="btn danger" onclick="clearAllData()">Clear all data</button>
       </div>
 
+      <div class="install-wrap">
+        <a href="#" id="installLink" class="install-link">Install this app</a>
+      </div>
+
       <div id="errorMsg" class="error-msg" style="display:none"></div>
 
       <!-- Mobile/Inline History -->
@@ -607,7 +636,7 @@
         <div class="accordion" id="historyAccordion"></div>
       </div>
 
-      <div class="footer">Installable as a PWA on modern browsers &nbsp;·&nbsp; Voice counting works best in Chrome/Edge</div>
+      <div class="footer">Voice counting works best in Chrome/Edge</div>
     </div> <!-- /.card -->
 
     <!-- Desktop Sidebar History -->
@@ -645,6 +674,8 @@
     const arabicText = document.getElementById('arabicText');
     const instructionBox = document.getElementById('instructionBox');
     const closeInstructionBtn = document.getElementById('closeInstructionBtn');
+    const installLink = document.getElementById('installLink');
+    let deferredInstallPrompt = null;
 
     if (localStorage.getItem('hideInstruction') === 'true') {
       instructionBox.style.display = 'none';
@@ -1081,8 +1112,38 @@
       });
     }
 
+    function setupInstallPrompt() {
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        installLink.style.display = 'none';
+      });
+
+      installLink.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          try {
+            await deferredInstallPrompt.userChoice;
+          } finally {
+            deferredInstallPrompt = null;
+          }
+          return;
+        }
+
+        window.alert('Install option is browser-managed. In Chrome/Edge, use the install icon in the address bar. On iPhone/iPad Safari, tap Share then Add to Home Screen.');
+      });
+    }
+
     arabicText.textContent = currentDhikr().arabic;
     syncCurrentDhikrStateToUi();
+    registerServiceWorker();
+    setupInstallPrompt();
   </script>
 </body>
 </html>

@@ -1,10 +1,16 @@
-﻿const CACHE_NAME = 'dhikr-counter-v1';
+﻿const CACHE_NAME = 'dhikr-counter-v2';
 const APP_SHELL_FILES = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icons/icon-192.svg',
-  './icons/icon-512.svg'
+  './icons/apple-touch-icon.png',
+  './icons/favicon-16x16.png',
+  './icons/favicon-32x32.png',
+  './icons/favicon-48x48.png',
+  './icons/favicon-96x96.png',
+  './icons/favicon.ico',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
