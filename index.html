@@ -895,7 +895,12 @@
 
     @media (min-width: 850px) {
       .app-container {
-        max-width: 1040px;
+        max-width: min(1600px, calc(100vw - 2rem));
+        align-items: stretch;
+      }
+
+      .card {
+        flex: 1;
       }
 
       .challenge-side-panel {
